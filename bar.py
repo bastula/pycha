@@ -6,6 +6,10 @@ from pycha.chart import Chart, uniqueIndices
 from pycha.color import Color, hex2rgb, clamp
 
 class BarChart(Chart):
+
+    def __init__(self, surface=None, options={}):
+        super(BarChart, self).__init__(surface, options)
+        self.bars = []
     
     def render(self, surface=None, options={}):
         """Renders the chart with the specified options.

@@ -7,13 +7,23 @@ from pycha.color import Color, hex2rgb
 
 class PieChart(Chart):
 
+    def __init__(self, surface=None, options={}):
+        super(PieChart, self).__init__(surface, options)
+        self.slices = []
+
     def render(self, surface=None, options={}):
+        """Renders the chart with the specified options.
+        
+        The optional parameters can be used to render a piechart in a different
+        surface with new options.
+        """
         self._evaluate(options)
         self._render(surface)
         self._renderPieChart()
         self._renderPieAxis()
 
     def _evaluate(self, options):
+        """Evaluates all the data needed to plot the pie chart"""
         self._eval(options)
 
         self.centerx = self.area.x + self.area.w * 0.5
@@ -25,6 +35,7 @@ class PieChart(Chart):
         self._evalPieTicks()
 
     def _evalPieChart(self):
+        """Evaluates measures for pie charts"""
         slices = [dict(name=key,
                        value=(i, value[0][1]))
                   for i, (key, value) in enumerate(self.dataSets)]
@@ -43,6 +54,7 @@ class PieChart(Chart):
                                          angle))
 
     def _renderPieChart(self):
+        """Renders a pie chart"""
         cx = cairo.Context(self.surface)
         cx.set_line_join(cairo.LINE_JOIN_ROUND)
 
@@ -77,6 +89,7 @@ class PieChart(Chart):
         cx.restore()
 
     def _evalPieTicks(self):
+        """Evaluates ticks for x and y axis"""
         self.xticks = []
 
         if self.options.axis.x.ticks:
@@ -93,6 +106,7 @@ class PieChart(Chart):
                 self.xticks.append((slice.xval, label))
 
     def _renderPieAxis(self):
+        """Renders the axis for pie charts"""
         if self.options.axis.x.hide or not self.xticks:
             return
 

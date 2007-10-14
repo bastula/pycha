@@ -5,6 +5,10 @@ from pycha.color import Color, hex2rgb, clamp
 
 class LineChart(Chart):
     
+    def __init__(self, surface=None, options={}):
+        super(LineChart, self).__init__(surface, options)
+        self.points = []
+
     def render(self, surface=None, options={}):
         """Renders the chart with the specified options.
         
@@ -23,6 +27,7 @@ class LineChart(Chart):
         self._evalLineTicks()
     
     def _evalLineChart(self):
+        """Evaluates measures for line charts"""
         self.points = []
 
         for i, (name, store) in enumerate(self.dataSets):
@@ -36,6 +41,7 @@ class LineChart(Chart):
                     self.points.append(point)
     
     def _renderLineChart(self):
+        """Renders a line chart"""
         cx = cairo.Context(self.surface)
         
         def preparePath(storeName):
