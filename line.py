@@ -8,18 +8,6 @@ class LineChart(Chart):
     def __init__(self, surface=None, options={}):
         super(LineChart, self).__init__(surface, options)
         self.points = []
-
-    def render(self, surface=None, options={}):
-        """Renders the chart with the specified options.
-        
-        The optional parameters can be used to render a linechart in a
-        different surface with new options.
-        """
-        self._eval(options)
-        self._render(surface)
-        self._renderLineChart()
-        self._renderLineAxis()
-        self._renderLegend()
         
     def _evalChart(self):
         """Evaluates measures for line charts"""
@@ -35,7 +23,7 @@ class LineChart(Chart):
                 if 0.0 <= point.x <= 1.0:
                     self.points.append(point)
     
-    def _renderLineChart(self):
+    def _renderChart(self):
         """Renders a line chart"""
         cx = cairo.Context(self.surface)
         

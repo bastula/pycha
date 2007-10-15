@@ -94,22 +94,20 @@ class Chart(object):
         self.setOptions()
         self.dataSets = []
 
-    def _initCanvas(self, surface):
-        if self.resetFlag:
-            self.resetFlag = False
-            self.clean()
+    def render(self, surface=None, options={}):
+        """Renders the chart with the specified options.
         
-        self.surface = surface
-        
-    def _render(self, surface=None):
-        """Function that does basic rendering of the legend and background.
-        
-        This function is called by all charts
+        The optional parameters can be used to render a piechart in a different
+        surface with new options.
         """
+        self._eval(options)
         if surface:
             self._initCanvas(surface)
         
         self._renderBackground()
+        self._renderChart()
+        self._renderAxis()
+        self._renderLegend()
 
     def clean(self):
         """Clears a canvas tag.
@@ -121,54 +119,7 @@ class Chart(object):
         cx.set_source_rgb(1, 1, 1)
         cx.paint()
         cx.restore()
-    
-    def _renderLegend(self):
-        """This function adds a legend to the chart"""
-        if self.options.legend.hide:
-            return
-        
-        cx = cairo.Context(self.surface)
-        padding = 4
-        bullet = 15
-        width = 0
-        height = padding
-        keys = self.getDataSetsKeys()
-        for key in self.getDataSetsKeys():
-            extents = cx.text_extents(key)
-            width = max(extents[2], width)
-            height += max(extents[3], bullet) + padding
-        width = padding + bullet + padding + width + padding
 
-        cx.save()
-        cx.rectangle(self.options.legend.position.left,
-                     self.options.legend.position.top,
-                     width, height)
-        cx.set_source_rgba(1, 1, 1, self.options.legend.opacity)
-        cx.fill_preserve()
-        cx.set_line_width(self.options.stroke.width)
-        cx.set_source_rgb(*hex2rgb(self.options.legend.borderColor))
-        cx.stroke()
-        
-        def drawKey(key, x, y, text_height):
-            cx.rectangle(x, y, bullet, bullet)
-            cx.set_source_rgb(*hex2rgb(self.options.colorScheme[key]))
-            cx.fill_preserve()
-            cx.set_source_rgb(0, 0, 0)
-            cx.stroke()
-            cx.move_to(x + bullet + padding,
-                       y + bullet / 2.0 + text_height / 2.0)
-            cx.show_text(key)
-        
-        cx.set_line_width(1)
-        x = self.options.legend.position.left + padding
-        y = self.options.legend.position.top + padding
-        for key in keys:
-            extents = cx.text_extents(key)
-            drawKey(key, x, y, extents[3])
-            y += max(extents[3], bullet) + padding
-
-        cx.restore()
-        
     def setColorscheme(self):
         """Sets the colorScheme used for the chart"""
         scheme = self.options.colorScheme
@@ -180,6 +131,108 @@ class Chart(object):
         else:
             raise TypeError("Color scheme is invalid!")
 
+    def _initCanvas(self, surface):
+        if self.resetFlag:
+            self.resetFlag = False
+            self.clean()
+        
+        self.surface = surface
+
+    # Eval functions
+    def _eval(self, options={}):
+        """Everytime a chart is rendered, we need to evaluate metric for
+        the axis"""
+        self.setOptions(options)
+        self.stores = self.getDataSetsValues()
+        self._evalXY()
+        self.setColorscheme()
+        self._evalChart()
+        self._evalTicks()
+
+    def _evalXY(self):
+        """Calculates all kinds of metrics for the x and y axis"""
+        
+        # calculate area data
+        width = (self.surface.get_width()
+                 - self.options.padding.left - self.options.padding.right)
+        height = (self.surface.get_height()
+                  - self.options.padding.top - self.options.padding.bottom)
+        self.area = Area(self.options.padding.left,
+                         self.options.padding.top,
+                         width, height)
+
+        # gather data for the x axis
+        if self.options.axis.x.range:
+            self.minxval, self.maxxval = self.options.axis.x.range
+            self.xscale = self.maxxval - self.minxval
+        else:
+            xdata = [pair[0] for pair in reduce(lambda a,b: a+b, self.stores)]
+            self.minxval = 0.0 if self.options.xOriginIsZero else float(min(xdata))
+            self.maxxval = float(max(xdata))
+
+        self.xrange = self.maxxval - self.minxval
+        self.xscale = 1.0 if self.xrange == 0 else 1 / self.xrange
+
+        # gather data for the y axis
+        if self.options.axis.y.range:
+            self.minyval, self.maxyval = self.options.axis.y.range
+            self.yscale = self.maxyval - self.minyval
+        else:
+            ydata = [pair[1] for pair in reduce(lambda a,b: a+b, self.stores)]
+            self.minyval = 0.0 if self.options.yOriginIsZero else float(min(ydata))
+            self.maxyval = float(max(ydata))
+
+        self.yrange = self.maxyval - self.minyval
+        self.yscale = 1.0 if self.yrange == 0 else 1 / self.yrange
+
+    def _evalChart(self):
+        raise NotImplementedError
+
+    def _evalTicks(self):
+        """Evaluates ticks for x and y axis"""
+        
+        # evaluate xTicks
+        self.xticks = []
+        if self.options.axis.x.ticks:
+            for tick in self.options.axis.x.ticks:
+                label = str(tick.v) if tick.label is None else tick.label
+                pos = self.xscale * (tick.v - self.minxval)
+                if 0.0 <= pos <= 1.0:
+                    self.xticks.append((pos, label))
+
+        elif self.options.axis.x.tickCount > 0:
+            uniqx = range(len(uniqueIndices(self.stores)) + 1)
+            roughSeparation = self.xrange / self.options.axis.x.tickCount
+
+            i = j = 0
+            while i + 1 < len(uniqx) and j < self.options.axis.x.tickCount:
+                if (uniqx[i + 1] - self.minxval) >= (j * roughSeparation):
+                    pos = self.xscale * (uniqx[i] - self.minxval)
+                    if 0.0 <= pos <= 1.0:
+                        self.xticks.append((pos, uniqx[i + 1]))
+                        j += 1
+                i += 1
+
+        # evaluate yTicks
+        self.yticks = []
+        if self.options.axis.y.ticks:
+            for tick in self.options.y.ticks:
+                label = str(tick.v) if tick.label is None else tick.label
+                pos = self.yscale * (tick.v - self.minyval)
+                if 0.0 <= pos <= 1.0:
+                    self.yticks.append((pos, label))
+
+        elif self.options.axis.y.tickCount > 0:
+            prec = self.options.axis.y.tickPrecision
+            num = self.yrange / self.options.axis.y.tickCount
+            roughSeparation = 1 if (num < 1 and prec == 0) else round(num, prec)
+            
+            for i in range(self.options.axis.y.tickCount + 1):
+                yval = self.minyval + (i * roughSeparation)
+                pos = 1.0 - ((yval - self.minyval) * self.yscale)
+                if 0.0 <= pos <= 1.0:
+                    self.yticks.append((pos, round(yval, prec)))
+            
     def _renderBackground(self):
         """Renders the background of the chart"""
         if self.options.background.hide:
@@ -221,10 +274,9 @@ class Chart(object):
         
         cx.restore()
 
-    def _renderLineAxis(self):
-        """Renders the axis for line charts"""
-        self._renderAxis()
-    
+    def _renderChart(self):
+        raise NotImplementedError
+
     def _renderAxis(self):
         """Renders axis"""
         if self.options.axis.x.hide and self.options.axis.y.hide:
@@ -300,96 +352,52 @@ class Chart(object):
 
         cx.restore()
 
-    def _eval(self, options={}):
-        """Everytime a chart is rendered, we need to evaluate metric for
-        the axis"""
-        self.setOptions(options)
-        self.stores = self.getDataSetsValues()
-        self._evalXY()
-        self.setColorscheme()
-        self._evalChart()
-        self._evalTicks()
-
-    def _evalXY(self):
-        """Calculates all kinds of metrics for the x and y axis"""
+    def _renderLegend(self):
+        """This function adds a legend to the chart"""
+        if self.options.legend.hide:
+            return
         
-        # calculate area data
-        width = (self.surface.get_width()
-                 - self.options.padding.left - self.options.padding.right)
-        height = (self.surface.get_height()
-                  - self.options.padding.top - self.options.padding.bottom)
-        self.area = Area(self.options.padding.left,
-                         self.options.padding.top,
-                         width, height)
+        cx = cairo.Context(self.surface)
+        padding = 4
+        bullet = 15
+        width = 0
+        height = padding
+        keys = self.getDataSetsKeys()
+        for key in self.getDataSetsKeys():
+            extents = cx.text_extents(key)
+            width = max(extents[2], width)
+            height += max(extents[3], bullet) + padding
+        width = padding + bullet + padding + width + padding
 
-        # gather data for the x axis
-        if self.options.axis.x.range:
-            self.minxval, self.maxxval = self.options.axis.x.range
-            self.xscale = self.maxxval - self.minxval
-        else:
-            xdata = [pair[0] for pair in reduce(lambda a,b: a+b, self.stores)]
-            self.minxval = 0.0 if self.options.xOriginIsZero else float(min(xdata))
-            self.maxxval = float(max(xdata))
-
-        self.xrange = self.maxxval - self.minxval
-        self.xscale = 1.0 if self.xrange == 0 else 1 / self.xrange
-
-        # gather data for the y axis
-        if self.options.axis.y.range:
-            self.minyval, self.maxyval = self.options.axis.y.range
-            self.yscale = self.maxyval - self.minyval
-        else:
-            ydata = [pair[1] for pair in reduce(lambda a,b: a+b, self.stores)]
-            self.minyval = 0.0 if self.options.yOriginIsZero else float(min(ydata))
-            self.maxyval = float(max(ydata))
-
-        self.yrange = self.maxyval - self.minyval
-        self.yscale = 1.0 if self.yrange == 0 else 1 / self.yrange
-
-    def _evalTicks(self):
-        """Evaluates ticks for x and y axis"""
+        cx.save()
+        cx.rectangle(self.options.legend.position.left,
+                     self.options.legend.position.top,
+                     width, height)
+        cx.set_source_rgba(1, 1, 1, self.options.legend.opacity)
+        cx.fill_preserve()
+        cx.set_line_width(self.options.stroke.width)
+        cx.set_source_rgb(*hex2rgb(self.options.legend.borderColor))
+        cx.stroke()
         
-        # evaluate xTicks
-        self.xticks = []
-        if self.options.axis.x.ticks:
-            for tick in self.options.axis.x.ticks:
-                label = str(tick.v) if tick.label is None else tick.label
-                pos = self.xscale * (tick.v - self.minxval)
-                if 0.0 <= pos <= 1.0:
-                    self.xticks.append((pos, label))
+        def drawKey(key, x, y, text_height):
+            cx.rectangle(x, y, bullet, bullet)
+            cx.set_source_rgb(*hex2rgb(self.options.colorScheme[key]))
+            cx.fill_preserve()
+            cx.set_source_rgb(0, 0, 0)
+            cx.stroke()
+            cx.move_to(x + bullet + padding,
+                       y + bullet / 2.0 + text_height / 2.0)
+            cx.show_text(key)
+        
+        cx.set_line_width(1)
+        x = self.options.legend.position.left + padding
+        y = self.options.legend.position.top + padding
+        for key in keys:
+            extents = cx.text_extents(key)
+            drawKey(key, x, y, extents[3])
+            y += max(extents[3], bullet) + padding
 
-        elif self.options.axis.x.tickCount > 0:
-            uniqx = range(len(uniqueIndices(self.stores)) + 1)
-            roughSeparation = self.xrange / self.options.axis.x.tickCount
-
-            i = j = 0
-            while i + 1 < len(uniqx) and j < self.options.axis.x.tickCount:
-                if (uniqx[i + 1] - self.minxval) >= (j * roughSeparation):
-                    pos = self.xscale * (uniqx[i] - self.minxval)
-                    if 0.0 <= pos <= 1.0:
-                        self.xticks.append((pos, uniqx[i + 1]))
-                        j += 1
-                i += 1
-
-        # evaluate yTicks
-        self.yticks = []
-        if self.options.axis.y.ticks:
-            for tick in self.options.y.ticks:
-                label = str(tick.v) if tick.label is None else tick.label
-                pos = self.yscale * (tick.v - self.minyval)
-                if 0.0 <= pos <= 1.0:
-                    self.yticks.append((pos, label))
-
-        elif self.options.axis.y.tickCount > 0:
-            prec = self.options.axis.y.tickPrecision
-            num = self.yrange / self.options.axis.y.tickCount
-            roughSeparation = 1 if (num < 1 and prec == 0) else round(num, prec)
-            
-            for i in range(self.options.axis.y.tickCount + 1):
-                yval = self.minyval + (i * roughSeparation)
-                pos = 1.0 - ((yval - self.minyval) * self.yscale)
-                if 0.0 <= pos <= 1.0:
-                    self.yticks.append((pos, round(yval, prec)))
+        cx.restore()
 
 def uniqueIndices(arr):
     return range(max([len(a) for a in arr]))

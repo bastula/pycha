@@ -11,18 +11,6 @@ class PieChart(Chart):
         super(PieChart, self).__init__(surface, options)
         self.slices = []
 
-    def render(self, surface=None, options={}):
-        """Renders the chart with the specified options.
-        
-        The optional parameters can be used to render a piechart in a different
-        surface with new options.
-        """
-        self._eval(options)
-        self._render(surface)
-        self._renderPieChart()
-        self._renderPieAxis()
-        self._renderLegend()
-
     def _evalChart(self):
         """Evaluates measures for pie charts"""
         self.centerx = self.area.x + self.area.w * 0.5
@@ -47,7 +35,36 @@ class PieChart(Chart):
                                          slice['value'][0], slice['value'][1],
                                          angle))
 
-    def _renderPieChart(self):
+    def _evalTicks(self):
+        """Evaluates ticks for x and y axis"""
+        self.xticks = []
+
+        if self.options.axis.x.ticks:
+            lookup = dict([(slice.xval, slice) for slice in self.slices])
+            for tick in self.options.axis.x.ticks:
+                slice = lookup[tick.v]
+                label = tick.label or str(tick.v)
+                if not slice:
+                    label += ' (%.1f%%)' % (slice.fraction * 100)
+                    self.xticks.append((tick.v, label))
+        else:
+            for slice in self.slices:
+                label = '%s (%.1f%%)' % (slice.xval, slice.fraction * 100)
+                self.xticks.append((slice.xval, label))
+
+    def _renderBackground(self):
+        """Renders the background of the chart"""
+        if self.options.background.hide:
+            return
+        
+        cx = cairo.Context(self.surface)
+        cx.save()
+        cx.set_source_rgb(*hex2rgb(self.options.background.color))
+        cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
+        cx.fill()
+        cx.restore()
+
+    def _renderChart(self):
         """Renders a pie chart"""
         cx = cairo.Context(self.surface)
         cx.set_line_join(cairo.LINE_JOIN_ROUND)
@@ -82,24 +99,7 @@ class PieChart(Chart):
 
         cx.restore()
 
-    def _evalTicks(self):
-        """Evaluates ticks for x and y axis"""
-        self.xticks = []
-
-        if self.options.axis.x.ticks:
-            lookup = dict([(slice.xval, slice) for slice in self.slices])
-            for tick in self.options.axis.x.ticks:
-                slice = lookup[tick.v]
-                label = tick.label or str(tick.v)
-                if not slice:
-                    label += ' (%.1f%%)' % (slice.fraction * 100)
-                    self.xticks.append((tick.v, label))
-        else:
-            for slice in self.slices:
-                label = '%s (%.1f%%)' % (slice.xval, slice.fraction * 100)
-                self.xticks.append((slice.xval, label))
-
-    def _renderPieAxis(self):
+    def _renderAxis(self):
         """Renders the axis for pie charts"""
         if self.options.axis.x.hide or not self.xticks:
             return
@@ -145,21 +145,6 @@ class PieChart(Chart):
             cx.move_to(x, y)
             cx.show_text(label)
             self.xlabels.append(label)
-
-    def _evalLineTicks(self):
-        return
-
-    def _renderBackground(self):
-        """Renders the background of the chart"""
-        if self.options.background.hide:
-            return
-        
-        cx = cairo.Context(self.surface)
-        cx.save()
-        cx.set_source_rgb(*hex2rgb(self.options.background.color))
-        cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
-        cx.fill()
-        cx.restore()
 
 class Slice(object):
     def __init__(self, name, fraction, xval, yval, angle):

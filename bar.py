@@ -10,19 +10,7 @@ class BarChart(Chart):
     def __init__(self, surface=None, options={}):
         super(BarChart, self).__init__(surface, options)
         self.bars = []
-    
-    def render(self, surface=None, options={}):
-        """Renders the chart with the specified options.
-        
-        The optional parameters can be used to render a barchart in a
-        different surface with new options.
-        """
-        self._eval(options)
-        self._render(surface)
-        self._renderBarChart()
-        self._renderAxis()
-        self._renderLegend()
-        
+            
     def _evalChart(self):
         if self.options.barOrientation == 'horizontal':
             self._evalHorizontalBarChart()
@@ -109,8 +97,19 @@ class BarChart(Chart):
                 
                 if (0.0 <= rect.x <= 1.0):
                     self.bars.append(rect)
-                    
-    def _renderBarChart(self):
+
+    def _evalTicks(self):
+        """Evaluates bar ticks"""
+        super(BarChart, self)._evalTicks()
+        self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
+                        tick[1]) for tick in self.xticks]
+
+        if self.options.barOrientation == 'horizontal':
+            tmp = self.xticks
+            self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
+            self.yticks = tmp
+
+    def _renderChart(self):
         """Renders a horizontal/vertical bar chart"""
         cx = cairo.Context(self.surface)
 
@@ -147,18 +146,6 @@ class BarChart(Chart):
         for bar in self.bars:
             drawBar(bar)
         cx.restore()
-    
-    def _evalTicks(self):
-        """Evaluates bar ticks"""
-        super(BarChart, self)._evalTicks()
-        self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
-                        tick[1]) for tick in self.xticks]
-
-        if self.options.barOrientation == 'horizontal':
-            tmp = self.xticks
-            self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
-            self.yticks = tmp
-
 
 class Rect(object):
     def __init__(self, x, y, w, h, xval, yval, name):
