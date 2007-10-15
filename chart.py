@@ -357,7 +357,7 @@ class Chart(object):
                     self.xticks.append((pos, label))
 
         elif self.options.axis.x.tickCount > 0:
-            uniqx = range(len(uniqueIndices(self.stores)) + 1)  
+            uniqx = range(len(uniqueIndices(self.stores)) + 1)
             roughSeparation = self.xrange / self.options.axis.x.tickCount
 
             i = j = 0
