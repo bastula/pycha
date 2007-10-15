@@ -27,24 +27,7 @@ class Chart(object):
         # initialize storage hash
         self.dataSets = []
 
-        # override the default options
-        self.setOptions(options)
-
-        # initialize the canvas
-        self._initCanvas(surface)
-
-    def addDataset(self, dataset):
-        """Adds an object containing chart data to the storage hash"""
-        self.dataSets += dataset
-
-    def getDataSetsKeys(self):
-        return [d[0] for d in self.dataSets]
-
-    def getDataSetsValues(self):
-        return [d[1] for d in self.dataSets]
-
-    def setOptions(self, options={}):
-        """Sets options of this chart"""
+        # set the default options
         self.options = Option(
             axis=Option(
                 lineWidth=1.0,
@@ -101,8 +84,25 @@ class Chart(object):
             yOriginIsZero=True,
             pieRadius=0.4,
             colorScheme=defaultColorscheme(self.getDataSetsKeys()),
-        )#.update(options)
-        
+        )
+        self.setOptions(options)
+
+        # initialize the canvas
+        self._initCanvas(surface)
+
+    def addDataset(self, dataset):
+        """Adds an object containing chart data to the storage hash"""
+        self.dataSets += dataset
+
+    def getDataSetsKeys(self):
+        return [d[0] for d in self.dataSets]
+
+    def getDataSetsValues(self):
+        return [d[1] for d in self.dataSets]
+
+    def setOptions(self, options={}):
+        """Sets options of this chart"""
+        self.options.merge(options)
 
     def reset(self):
         """Resets options and datasets"""
@@ -140,11 +140,13 @@ class Chart(object):
     def setColorscheme(self):
         """Sets the colorScheme used for the chart"""
         scheme = self.options.colorScheme
-        if isinstance(scheme, object):
+        keys = self.getDataSetsKeys()
+        if isinstance(scheme, dict):
+            if not scheme:
+                self.options.colorScheme = defaultColorscheme(keys)
             return
         elif isinstance(scheme, basestring):
-            self.options.colorScheme = getColorscheme(scheme,
-                                                      self.getDataSetsKeys())
+            self.options.colorScheme = getColorscheme(scheme, keys)
         else:
             raise TypeError("Color scheme is invalid!")
 
@@ -426,3 +428,11 @@ class Option(dict):
             return self[name]
         else:
             raise AttributeError(name)
+
+    def merge(self, other):
+        for key, value in other.items():
+            if self.has_key(key):
+                if isinstance(self[key], Option):
+                    self[key].merge(other[key])
+                else:
+                    self[key] = other[key]
