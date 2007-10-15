@@ -10,14 +10,49 @@ class BarChart(Chart):
     def __init__(self, surface=None, options={}):
         super(BarChart, self).__init__(surface, options)
         self.bars = []
+
+    def _renderChart(self):
+        """Renders a horizontal/vertical bar chart"""
+        cx = cairo.Context(self.surface)
+
+        def drawBar(bar):
+            cx.set_line_width(self.options.stroke.width)
             
+            # gather bar proportions
+            x = self.area.w * bar.x + self.area.x
+            y = self.area.h * bar.y + self.area.y
+            w = self.area.w * bar.w
+            h = self.area.h * bar.h
+            
+            if w < 1 or h < 1:
+                return # don't draw when the bar is too small
+            
+            if self.options.stroke.shadow:
+                cx.set_source_rgba(0, 0, 0, 0.15)
+                if self.options.barOrientation == 'vertical':
+                    cx.rectangle(x-2, y-2, w+4, h+2)
+                else:
+                    cx.rectangle(x, y-2, w+2, h+4)
+                cx.fill()
+            
+            if self.options.shouldFill:
+                cx.rectangle(x, y, w, h)
+                cx.set_source_rgb(*hex2rgb(self.options.colorScheme[bar.name]))
+                cx.fill_preserve()
+            
+            if not self.options.stroke.hide:
+                cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
+                cx.stroke()
+        
+        cx.save()
+        for bar in self.bars:
+            drawBar(bar)
+        cx.restore()
+
+
+class VerticalBarChart(BarChart):
+
     def _evalChart(self):
-        if self.options.barOrientation == 'horizontal':
-            self._evalHorizontalBarChart()
-        else:
-            self._evalVerticalBarChart()
-    
-    def _evalVerticalBarChart(self):
         """Evaluates measures for vertical bars"""
         uniqx = uniqueIndices(self.stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
@@ -61,7 +96,21 @@ class BarChart(Chart):
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
-    def _evalHorizontalBarChart(self):
+    def _evalTicks(self):
+        """Evaluates bar ticks"""
+        super(BarChart, self)._evalTicks()
+        self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
+                        tick[1]) for tick in self.xticks]
+
+        if self.options.barOrientation == 'horizontal':
+            tmp = self.xticks
+            self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
+            self.yticks = tmp
+
+
+class HorizontalBarChart(BarChart):
+
+    def _evalChart(self):
         """Evaluates measures for horizontal bars"""
         uniqx = uniqueIndices(self.stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
@@ -101,51 +150,10 @@ class BarChart(Chart):
     def _evalTicks(self):
         """Evaluates bar ticks"""
         super(BarChart, self)._evalTicks()
-        self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
-                        tick[1]) for tick in self.xticks]
-
-        if self.options.barOrientation == 'horizontal':
-            tmp = self.xticks
-            self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
-            self.yticks = tmp
-
-    def _renderChart(self):
-        """Renders a horizontal/vertical bar chart"""
-        cx = cairo.Context(self.surface)
-
-        def drawBar(bar):
-            cx.set_line_width(self.options.stroke.width)
-            
-            # gather bar proportions
-            x = self.area.w * bar.x + self.area.x
-            y = self.area.h * bar.y + self.area.y
-            w = self.area.w * bar.w
-            h = self.area.h * bar.h
-            
-            if w < 1 or h < 1:
-                return # don't draw when the bar is too small
-            
-            if self.options.stroke.shadow:
-                cx.set_source_rgba(0, 0, 0, 0.15)
-                if self.options.barOrientation == 'vertical':
-                    cx.rectangle(x-2, y-2, w+4, h+2)
-                else:
-                    cx.rectangle(x, y-2, w+2, h+4)
-                cx.fill()
-            
-            if self.options.shouldFill:
-                cx.rectangle(x, y, w, h)
-                cx.set_source_rgb(*hex2rgb(self.options.colorScheme[bar.name]))
-                cx.fill_preserve()
-            
-            if not self.options.stroke.hide:
-                cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
-                cx.stroke()
-        
-        cx.save()
-        for bar in self.bars:
-            drawBar(bar)
-        cx.restore()
+        tmp = self.xticks
+        self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
+        self.yticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
+                        tick[1]) for tick in tmp]
 
 class Rect(object):
     def __init__(self, x, y, w, h, xval, yval, name):

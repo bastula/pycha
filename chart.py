@@ -80,7 +80,6 @@ class Chart(object):
             fillOpacity=1.0,
             shouldFill=True,
             barWidthFillFraction=0.75,
-            barOrientation='vertical',
             xOriginIsZero=True,
             yOriginIsZero=True,
             pieRadius=0.4,
