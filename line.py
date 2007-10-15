@@ -19,6 +19,7 @@ class LineChart(Chart):
         self._render(surface)
         self._renderLineChart()
         self._renderLineAxis()
+        self._renderLegend()
     
     def _evaluate(self, options={}):
         """Evaluates all the data needed to plot the line chart"""

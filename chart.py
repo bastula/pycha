@@ -63,13 +63,13 @@ class Chart(object):
                 borderColor='#000000',
                 style={},
                 hide=False,
-                position=Option(top='20px', left='40px'),
+                position=Option(top=20, left=40),
             ),
             padding=Option(
                 left=30,
                 right=30,
-                top=5,
-                bottom=10,
+                top=15,
+                bottom=15,
             ),
             stroke=Option(
                 color='#ffffff',
@@ -110,20 +110,64 @@ class Chart(object):
             self._initCanvas(surface)
         
         self._renderBackground()
-        self._renderLegend()
 
     def clean(self):
         """Clears a canvas tag.
         
         This removes all renderings including axis, legends etc
         """
-        # TODO clearRect the canvas
+        cx = cairo.Context(self.surface)
+        cx.save()
+        cx.set_source_rgb(1, 1, 1)
+        cx.paint()
+        cx.restore()
     
     def _renderLegend(self):
         """This function adds a legend to the chart"""
         if self.options.legend.hide:
             return
-        # TODO
+        
+        cx = cairo.Context(self.surface)
+        padding = 4
+        bullet = 15
+        width = 0
+        height = padding
+        keys = self.getDataSetsKeys()
+        for key in self.getDataSetsKeys():
+            extents = cx.text_extents(key)
+            width = max(extents[2], width)
+            height += max(extents[3], bullet) + padding
+        width = padding + bullet + padding + width + padding
+
+        cx.save()
+        cx.rectangle(self.options.legend.position.left,
+                     self.options.legend.position.top,
+                     width, height)
+        cx.set_source_rgba(1, 1, 1, self.options.legend.opacity)
+        cx.fill_preserve()
+        cx.set_line_width(self.options.stroke.width)
+        cx.set_source_rgb(*hex2rgb(self.options.legend.borderColor))
+        cx.stroke()
+        
+        def drawKey(key, x, y, text_height):
+            cx.rectangle(x, y, bullet, bullet)
+            cx.set_source_rgb(*hex2rgb(self.options.colorScheme[key]))
+            cx.fill_preserve()
+            cx.set_source_rgb(0, 0, 0)
+            cx.stroke()
+            cx.move_to(x + bullet + padding,
+                       y + bullet / 2.0 + text_height / 2.0)
+            cx.show_text(key)
+        
+        cx.set_line_width(1)
+        x = self.options.legend.position.left + padding
+        y = self.options.legend.position.top + padding
+        for key in keys:
+            extents = cx.text_extents(key)
+            drawKey(key, x, y, extents[3])
+            y += max(extents[3], bullet) + padding
+
+        cx.restore()
         
     def setColorscheme(self):
         """Sets the colorScheme used for the chart"""
@@ -144,19 +188,14 @@ class Chart(object):
         cx = cairo.Context(self.surface)
         cx.save()
         cx.set_source_rgb(*hex2rgb(self.options.background.color))
-        cx.paint()
+        cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
+        cx.fill()
         cx.set_source_rgb(*hex2rgb(self.options.background.lineColor))
         cx.set_line_width(self.options.axis.lineWidth)
-        
-        return
-
-        if self.type == 'pie':
-            cx.restore()
-            return
-        
+                
         ticks = self.yticks
         horiz = False
-        if self.type == 'bar' and self.options.barOrientation == 'horizontal':
+        if self.options.barOrientation == 'horizontal':
             ticks = self.xticks
             horiz = True
         
@@ -171,7 +210,7 @@ class Chart(object):
                 x2 = x1 + self.area.w
                 y1 = y2 = tick[0] * self.area.h + self.area.y
 
-            cx.begin_path()
+            cx.new_path()
             cx.move_to(x1, y1)
             cx.line_to(x2, y2)
             cx.close_path()
@@ -211,8 +250,14 @@ class Chart(object):
                     cx.close_path()
                     cx.stroke()
                     
-                    # TODO, draw the label
-                    label = tick[1]
+                    label =  unicode(tick[1])
+                    extents = cx.text_extents(label)
+                    labelWidth = extents[2]
+                    labelHeight = extents[3]
+                    cx.move_to(x - self.options.axis.tickSize - labelWidth - 5,
+                               y + labelHeight / 2.0)
+                    cx.show_text(label)
+                    
                     return label
                 self.ylabels = [collectYLabels(tick) for tick in self.yticks]
                 
@@ -237,8 +282,13 @@ class Chart(object):
                     cx.close_path()
                     cx.stroke()
                     
-                    # TODO, draw the label
-                    label = tick[1]
+                    label = unicode(tick[1])
+                    extents = cx.text_extents(label)
+                    labelWidth = extents[2]
+                    labelHeight = extents[3]
+                    cx.move_to(x - labelWidth / 2.0,
+                               y + self.options.axis.tickSize + 10)
+                    cx.show_text(label)
                     return label
                 self.xlabels = [collectXLabels(tick) for tick in self.xticks]
             
@@ -307,7 +357,7 @@ class Chart(object):
                     self.xticks.append((pos, label))
 
         elif self.options.axis.x.tickCount > 0:
-            uniqx = uniqueIndices(self.stores)
+            uniqx = range(len(uniqueIndices(self.stores)) + 1)
             roughSeparation = self.xrange / self.options.axis.x.tickCount
 
             i = j = 0

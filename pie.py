@@ -21,6 +21,7 @@ class PieChart(Chart):
         self._render(surface)
         self._renderPieChart()
         self._renderPieAxis()
+        self._renderLegend()
 
     def _evaluate(self, options):
         """Evaluates all the data needed to plot the pie chart"""
@@ -154,6 +155,18 @@ class PieChart(Chart):
 
     def _evalLineTicks(self):
         return
+
+    def _renderBackground(self):
+        """Renders the background of the chart"""
+        if self.options.background.hide:
+            return
+        
+        cx = cairo.Context(self.surface)
+        cx.save()
+        cx.set_source_rgb(*hex2rgb(self.options.background.color))
+        cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
+        cx.fill()
+        cx.restore()
 
 class Slice(object):
     def __init__(self, name, fraction, xval, yval, angle):
