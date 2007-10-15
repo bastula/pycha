@@ -1,7 +1,5 @@
-import cairo
-
 from pycha.chart import Chart
-from pycha.color import Color, hex2rgb, clamp
+from pycha.color import hex2rgb, clamp
 
 class LineChart(Chart):
     
@@ -9,7 +7,7 @@ class LineChart(Chart):
         super(LineChart, self).__init__(surface, options)
         self.points = []
         
-    def _evalChart(self):
+    def _updateChart(self):
         """Evaluates measures for line charts"""
         self.points = []
 
@@ -23,10 +21,8 @@ class LineChart(Chart):
                 if 0.0 <= point.x <= 1.0:
                     self.points.append(point)
     
-    def _renderChart(self):
-        """Renders a line chart"""
-        cx = cairo.Context(self.surface)
-        
+    def _renderChart(self, cx):
+        """Renders a line chart"""        
         def preparePath(storeName):
             cx.new_path()
             cx.move_to(self.area.x, self.area.y + self.area.h)
@@ -40,7 +36,7 @@ class LineChart(Chart):
             if self.options.shouldFill:
                 cx.close_path()
             else:
-                cx.set_source_rgb(*hex2rgb(self.options.colorScheme[storeName]))
+                cx.set_source_rgb(*self.options.colorScheme[storeName])
                 cx.stroke()
         
 
@@ -58,7 +54,7 @@ class LineChart(Chart):
                     cx.restore()
                 
                 # fill the line
-                cx.set_source_rgb(*hex2rgb(self.options.colorScheme[storeName]))
+                cx.set_source_rgb(*self.options.colorScheme[storeName])
                 preparePath(storeName)
                 cx.fill()
                 

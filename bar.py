@@ -1,9 +1,5 @@
-import sys
-
-import cairo
-
 from pycha.chart import Chart, uniqueIndices
-from pycha.color import Color, hex2rgb, clamp
+from pycha.color import hex2rgb, clamp
 
 class BarChart(Chart):
 
@@ -11,9 +7,8 @@ class BarChart(Chart):
         super(BarChart, self).__init__(surface, options)
         self.bars = []
 
-    def _renderChart(self):
+    def _renderChart(self, cx):
         """Renders a horizontal/vertical bar chart"""
-        cx = cairo.Context(self.surface)
 
         def drawBar(bar):
             cx.set_line_width(self.options.stroke.width)
@@ -29,15 +24,13 @@ class BarChart(Chart):
             
             if self.options.stroke.shadow:
                 cx.set_source_rgba(0, 0, 0, 0.15)
-                if self.options.barOrientation == 'vertical':
-                    cx.rectangle(x-2, y-2, w+4, h+2)
-                else:
-                    cx.rectangle(x, y-2, w+2, h+4)
+                rectangle = self._getShadowRectangle(x, y, w, h)
+                cx.rectangle(*rectangle)
                 cx.fill()
             
             if self.options.shouldFill:
                 cx.rectangle(x, y, w, h)
-                cx.set_source_rgb(*hex2rgb(self.options.colorScheme[bar.name]))
+                cx.set_source_rgb(*self.options.colorScheme[bar.name])
                 cx.fill_preserve()
             
             if not self.options.stroke.hide:
@@ -49,10 +42,9 @@ class BarChart(Chart):
             drawBar(bar)
         cx.restore()
 
-
 class VerticalBarChart(BarChart):
 
-    def _evalChart(self):
+    def _updateChart(self):
         """Evaluates measures for vertical bars"""
         uniqx = uniqueIndices(self.stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
@@ -96,21 +88,19 @@ class VerticalBarChart(BarChart):
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
-    def _evalTicks(self):
+    def _updateTicks(self):
         """Evaluates bar ticks"""
-        super(BarChart, self)._evalTicks()
+        super(BarChart, self)._updateTicks()
         self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
                         tick[1]) for tick in self.xticks]
 
-        if self.options.barOrientation == 'horizontal':
-            tmp = self.xticks
-            self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
-            self.yticks = tmp
+    def _getShadowRectangle(self, x, y, w, h):
+        return (x-2, y-2, w+4, h+2)
 
 
 class HorizontalBarChart(BarChart):
 
-    def _evalChart(self):
+    def _updateChart(self):
         """Evaluates measures for horizontal bars"""
         uniqx = uniqueIndices(self.stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
@@ -147,13 +137,24 @@ class HorizontalBarChart(BarChart):
                 if (0.0 <= rect.x <= 1.0):
                     self.bars.append(rect)
 
-    def _evalTicks(self):
+    def _updateTicks(self):
         """Evaluates bar ticks"""
-        super(BarChart, self)._evalTicks()
+        super(BarChart, self)._updateTicks()
         tmp = self.xticks
         self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
         self.yticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
                         tick[1]) for tick in tmp]
+
+
+    def _renderLines(self, cx):
+        """Aux function for _renderBackground"""
+        ticks = self.xticks
+        for tick in ticks:
+            self._renderLine(cx, tick, True)
+
+    def _getShadowRectangle(self, x, y, w, h):
+        return (x, y-2, w+2, h+4)
+
 
 class Rect(object):
     def __init__(self, x, y, w, h, xval, yval, name):

@@ -96,17 +96,18 @@ class Chart(object):
     def render(self, surface=None, options={}):
         """Renders the chart with the specified options.
         
-        The optional parameters can be used to render a piechart in a different
+        The optional parameters can be used to render a chart in a different
         surface with new options.
         """
-        self._eval(options)
+        self._update(options)
         if surface:
             self._initCanvas(surface)
         
-        self._renderBackground()
-        self._renderChart()
-        self._renderAxis()
-        self._renderLegend()
+        cx = cairo.Context(self.surface)
+        self._renderBackground(cx)
+        self._renderChart(cx)
+        self._renderAxis(cx)
+        self._renderLegend(cx)
 
     def clean(self):
         """Clears a canvas tag.
@@ -137,18 +138,18 @@ class Chart(object):
         
         self.surface = surface
 
-    # Eval functions
-    def _eval(self, options={}):
+    # update methods
+    def _update(self, options={}):
         """Everytime a chart is rendered, we need to evaluate metric for
         the axis"""
         self.setOptions(options)
         self.stores = self.getDataSetsValues()
-        self._evalXY()
+        self._updateXY()
         self.setColorscheme()
-        self._evalChart()
-        self._evalTicks()
+        self._updateChart()
+        self._updateTicks()
 
-    def _evalXY(self):
+    def _updateXY(self):
         """Calculates all kinds of metrics for the x and y axis"""
         
         # calculate area data
@@ -184,10 +185,10 @@ class Chart(object):
         self.yrange = self.maxyval - self.minyval
         self.yscale = 1.0 if self.yrange == 0 else 1 / self.yrange
 
-    def _evalChart(self):
+    def _updateChart(self):
         raise NotImplementedError
 
-    def _evalTicks(self):
+    def _updateTicks(self):
         """Evaluates ticks for x and y axis"""
         
         # evaluate xTicks
@@ -232,56 +233,54 @@ class Chart(object):
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, round(yval, prec)))
             
-    def _renderBackground(self):
+    # render methods
+    def _renderBackground(self, cx):
         """Renders the background of the chart"""
         if self.options.background.hide:
             return
         
-        cx = cairo.Context(self.surface)
         cx.save()
         cx.set_source_rgb(*hex2rgb(self.options.background.color))
         cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
         cx.fill()
         cx.set_source_rgb(*hex2rgb(self.options.background.lineColor))
         cx.set_line_width(self.options.axis.lineWidth)
-                
-        ticks = self.yticks
-        horiz = False
-        if self.options.barOrientation == 'horizontal':
-            ticks = self.xticks
-            horiz = True
         
-        def drawLine(tick):
-            x1, x2, y1, y2 = (0, 0, 0, 0)
-            if horiz:
-                x1 = x2 = tick[0] * self.area.w + self.area.x
-                y1 = self.area.y
-                y2 = y1 + self.area.h
-            else:
-                x1 = self.area.x
-                x2 = x1 + self.area.w
-                y1 = y2 = tick[0] * self.area.h + self.area.y
-
-            cx.new_path()
-            cx.move_to(x1, y1)
-            cx.line_to(x2, y2)
-            cx.close_path()
-            cx.stroke()
-
-        for tick in ticks:
-            drawLine(tick)
+        self._renderLines(cx)
         
         cx.restore()
 
-    def _renderChart(self):
+    def _renderLines(self, cx):
+        """Aux function for _renderBackground"""
+        ticks = self.yticks
+        for tick in ticks:
+            self._renderLine(cx, tick, False)
+        
+    def _renderLine(self, cx, tick, horiz):
+        x1, x2, y1, y2 = (0, 0, 0, 0)
+        if horiz:
+            x1 = x2 = tick[0] * self.area.w + self.area.x
+            y1 = self.area.y
+            y2 = y1 + self.area.h
+        else:
+            x1 = self.area.x
+            x2 = x1 + self.area.w
+            y1 = y2 = tick[0] * self.area.h + self.area.y
+
+        cx.new_path()
+        cx.move_to(x1, y1)
+        cx.line_to(x2, y2)
+        cx.close_path()
+        cx.stroke()
+
+    def _renderChart(self, cx):
         raise NotImplementedError
 
-    def _renderAxis(self):
+    def _renderAxis(self, cx):
         """Renders axis"""
         if self.options.axis.x.hide and self.options.axis.y.hide:
             return
         
-        cx = cairo.Context(self.surface)
         cx.save()
         cx.set_source_rgb(*hex2rgb(self.options.axis.lineColor))
         cx.set_line_width(self.options.axis.lineWidth)
@@ -351,12 +350,11 @@ class Chart(object):
 
         cx.restore()
 
-    def _renderLegend(self):
+    def _renderLegend(self, cx):
         """This function adds a legend to the chart"""
         if self.options.legend.hide:
             return
         
-        cx = cairo.Context(self.surface)
         padding = 4
         bullet = 15
         width = 0
@@ -380,7 +378,7 @@ class Chart(object):
         
         def drawKey(key, x, y, text_height):
             cx.rectangle(x, y, bullet, bullet)
-            cx.set_source_rgb(*hex2rgb(self.options.colorScheme[key]))
+            cx.set_source_rgb(*self.options.colorScheme[key])
             cx.fill_preserve()
             cx.set_source_rgb(0, 0, 0)
             cx.stroke()

@@ -1,50 +1,32 @@
-class Color(object):
+def clamp(minValue, maxValue, value):
+    if value < minValue:
+        return minValue
+    if value > maxValue:
+        return maxValue
+    return value
+    
+def hex2rgb(hexstring, top=255.0):
+    if isinstance(hexstring, (tuple, list)):
+        return hexstring
 
-    def __init__(self, color):
-        self.toHex(color)
+    r = int(hexstring[1:3], 16)
+    g = int(hexstring[3:5], 16)
+    b = int(hexstring[5:7], 16)
+    return r / top, g / top, b / top
 
-    def toHex(self, color):
-        """Parses and stores the hex values of the input color string"""
-        # TODO
-        self.r = int(color[1:3], 16)
-        self.g = int(color[3:5], 16)
-        self.b = int(color[5:7], 16)
-        return self.check()
-
-    def lighten(self, level):
-        """Lightens the color"""
-        self.r += level
-        self.g += level
-        self.b += level
-        return self.check()
-
-    def darken(self, level):
-        """Darkens the color"""
-        self.r -= level
-        self.g -= level
-        self.b -= level
-        return self.check()
-
-    def check(self):
-        """Checks and validates if the hex values r, g and b are
-        between 0 and 255"""
-        self.r = clamp(0, 255, self.r)
-        self.g = clamp(0, 255, self.g)
-        self.b = clamp(0, 255, self.b)
-        return self
-
-    def toHexString(self):
-        return '#%02x%02x%02x' % (self.r, self.g, self.b)
-
-    def toRgbString(self):
-        return 'rgb(%d, %d, %d)' % (self.r, self.g, self.b)
-
-    def toRgbaString(self, alpha):
-        return 'rgb(%d, %d, %d, %d)' % (self.r, self.g, self.b, alpha)
-
+def lighten(r, g, b, amount):
+    return (clamp(0.0, 1.0, r + amount),
+            clamp(0.0, 1.0, g + amount),
+            clamp(0.0, 1.0, b + amount))
+    
 def generateColorscheme(hex, keys):
-    color = Color(hex)
-    return dict([(key, color.lighten(25).toHexString()) for key in keys])
+    r, g, b = hex2rgb(hex)
+    light = 0.098
+    scheme = {}
+    for key in keys:
+        scheme[key] = lighten(r, g, b, light)
+        light += 0.098
+    return scheme
 
 def defaultColorscheme(keys):
     return generateColorscheme('#3c581a', keys)
@@ -60,14 +42,3 @@ colorSchemes = dict(
     black='#000000',
     darkcyan='#305755'
     )
-
-def clamp(minValue, maxValue, value):
-    if value < minValue:
-        return minValue
-    if value > maxValue:
-        return maxValue
-    return value
-
-def hex2rgb(hexstring):
-    color = Color(hexstring)
-    return color.r / 255.0, color.g / 255.0, color.b / 255.0
