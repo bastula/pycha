@@ -15,19 +15,13 @@ class LineChart(Chart):
         The optional parameters can be used to render a linechart in a
         different surface with new options.
         """
-        self._evaluate(options)
+        self._eval(options)
         self._render(surface)
         self._renderLineChart()
         self._renderLineAxis()
         self._renderLegend()
-    
-    def _evaluate(self, options={}):
-        """Evaluates all the data needed to plot the line chart"""
-        self._eval(options)
-        self._evalLineChart()
-        self._evalLineTicks()
-    
-    def _evalLineChart(self):
+        
+    def _evalChart(self):
         """Evaluates measures for line charts"""
         self.points = []
 

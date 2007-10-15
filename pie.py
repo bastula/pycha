@@ -17,26 +17,19 @@ class PieChart(Chart):
         The optional parameters can be used to render a piechart in a different
         surface with new options.
         """
-        self._evaluate(options)
+        self._eval(options)
         self._render(surface)
         self._renderPieChart()
         self._renderPieAxis()
         self._renderLegend()
 
-    def _evaluate(self, options):
-        """Evaluates all the data needed to plot the pie chart"""
-        self._eval(options)
-
+    def _evalChart(self):
+        """Evaluates measures for pie charts"""
         self.centerx = self.area.x + self.area.w * 0.5
         self.centery = self.area.y + self.area.h * 0.5
         self.radius = min(self.area.w * self.options.pieRadius,
                           self.area.h * self.options.pieRadius)
 
-        self._evalPieChart()
-        self._evalPieTicks()
-
-    def _evalPieChart(self):
-        """Evaluates measures for pie charts"""
         slices = [dict(name=key,
                        value=(i, value[0][1]))
                   for i, (key, value) in enumerate(self.dataSets)]
@@ -89,7 +82,7 @@ class PieChart(Chart):
 
         cx.restore()
 
-    def _evalPieTicks(self):
+    def _evalTicks(self):
         """Evaluates ticks for x and y axis"""
         self.xticks = []
 

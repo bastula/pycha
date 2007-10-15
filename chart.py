@@ -307,6 +307,8 @@ class Chart(object):
         self.stores = self.getDataSetsValues()
         self._evalXY()
         self.setColorscheme()
+        self._evalChart()
+        self._evalTicks()
 
     def _evalXY(self):
         """Calculates all kinds of metrics for the x and y axis"""
@@ -344,8 +346,8 @@ class Chart(object):
         self.yrange = self.maxyval - self.minyval
         self.yscale = 1.0 if self.yrange == 0 else 1 / self.yrange
 
-    def _evalLineTicks(self):
-        """Evaluates line ticks for x and y axis"""
+    def _evalTicks(self):
+        """Evaluates ticks for x and y axis"""
         
         # evaluate xTicks
         self.xticks = []

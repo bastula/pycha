@@ -17,20 +17,17 @@ class BarChart(Chart):
         The optional parameters can be used to render a barchart in a
         different surface with new options.
         """
-        self._evaluate(options)
+        self._eval(options)
         self._render(surface)
         self._renderBarChart()
         self._renderAxis()
         self._renderLegend()
-    
-    def _evaluate(self, options={}):
-        """Evaluates all the data needed to plot the bar chart"""
-        self._eval(options)
+        
+    def _evalChart(self):
         if self.options.barOrientation == 'horizontal':
             self._evalHorizontalBarChart()
         else:
             self._evalVerticalBarChart()
-        self._evalBarTicks()
     
     def _evalVerticalBarChart(self):
         """Evaluates measures for vertical bars"""
@@ -151,9 +148,9 @@ class BarChart(Chart):
             drawBar(bar)
         cx.restore()
     
-    def _evalBarTicks(self):
+    def _evalTicks(self):
         """Evaluates bar ticks"""
-        self._evalLineTicks()
+        super(BarChart, self)._evalTicks()
         self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
                         tick[1]) for tick in self.xticks]
 
