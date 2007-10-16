@@ -80,6 +80,6 @@ def testLine():
     surface.write_to_png("testline.png")
 
 
-#testPie()
+testPie()
 testBar()
-#testLine()
+testLine()
