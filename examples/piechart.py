@@ -21,21 +21,17 @@ import cairo
 
 import pycha.pie
 
+from lines import lines
+
 def pieChart(output):
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
 
-    dataSet = (
-        ('bar.py', [[0, 180]]),
-        ('chart.py', [[0, 437]]),
-        ('color.py', [[0, 61]]),
-        ('line.py', [[0, 96]]),
-        ('pie.py', [[0, 187]]),
-        )
+    dataSet = [(line[0], [[0, line[1]]]) for line in lines]
 
     options = {
         'axis': {
             'x': {
-                'ticks': [dict(v=i, label=d[0]) for i, d in enumerate(dataSet)],
+                'ticks': [dict(v=i, label=d[0]) for i, d in enumerate(lines)],
             }
         },
         'background': {
