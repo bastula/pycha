@@ -19,7 +19,7 @@ import math
 
 import cairo
 
-from pycha.chart import Chart
+from pycha.chart import Chart, Option
 from pycha.color import hex2rgb
 
 class PieChart(Chart):
@@ -39,7 +39,7 @@ class PieChart(Chart):
                        value=(i, value[0][1]))
                   for i, (key, value) in enumerate(self.dataSets)]
 
-        s = sum([slice['value'][1] for slice in slices])
+        s = float(sum([slice['value'][1] for slice in slices]))
 
         fraction = angle = 0.0
 
@@ -55,13 +55,14 @@ class PieChart(Chart):
     def _updateTicks(self):
         """Evaluates pie ticks"""
         self.xticks = []
-
         if self.options.axis.x.ticks:
             lookup = dict([(slice.xval, slice) for slice in self.slices])
             for tick in self.options.axis.x.ticks:
+                if not isinstance(tick, Option):
+                    tick = Option(tick)
                 slice = lookup[tick.v]
                 label = tick.label or str(tick.v)
-                if not slice:
+                if slice:
                     label += ' (%.1f%%)' % (slice.fraction * 100)
                     self.xticks.append((tick.v, label))
         else:
