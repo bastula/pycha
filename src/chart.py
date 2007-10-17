@@ -214,6 +214,8 @@ class Chart(object):
         self.xticks = []
         if self.options.axis.x.ticks:
             for tick in self.options.axis.x.ticks:
+                if not isinstance(tick, Option):
+                    tick = Option(tick)
                 label = str(tick.v) if tick.label is None else tick.label
                 pos = self.xscale * (tick.v - self.minxval)
                 if 0.0 <= pos <= 1.0:
@@ -236,6 +238,8 @@ class Chart(object):
         self.yticks = []
         if self.options.axis.y.ticks:
             for tick in self.options.y.ticks:
+                if not isinstance(tick, Option):
+                    tick = Option(tick)
                 label = str(tick.v) if tick.label is None else tick.label
                 pos = self.yscale * (tick.v - self.minyval)
                 if 0.0 <= pos <= 1.0:

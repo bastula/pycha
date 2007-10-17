@@ -23,7 +23,7 @@ def read(*rnames):
 
 setup(
     name="pycha",
-    version="0.1.0",
+    version="0.1.0dev",
     author="Lorenzo Gil Sanchez",
     author_email="lorenzo.gil.sanchez@gmail.com",
     description="A library for making charts with Python",
@@ -36,6 +36,7 @@ setup(
     keywords="chart cairo",
     packages=['pycha'],
     package_dir={'pycha': 'src'},
+    url='http://www.lorenzogil.com/projects/pycha/',
     # if would be nice if pycairo would have an egg (sigh)
 #    install_requires = [
 #        'pycairo',
