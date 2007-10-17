@@ -20,8 +20,6 @@ import sys
 import cairo
 
 import pycha.pie
-import pycha.bar
-import pycha.line
 
 def pieChart(output):
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
