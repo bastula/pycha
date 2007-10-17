@@ -23,7 +23,7 @@ import pycha.bar
 
 from lines import lines
 
-def barChart(output):
+def barChart(output, chartFactory):
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 200)
 
     dataSet = (
@@ -48,10 +48,10 @@ def barChart(output):
             'hide': True,
         },
         'padding': {
-            'left': 40
+            'left': 55
         }
     }
-    chart = pycha.bar.VerticalBarChart(surface, options)
+    chart = chartFactory(surface, options)
 
     chart.addDataset(dataSet)
     chart.render()
@@ -60,4 +60,5 @@ def barChart(output):
 
 if __name__ == '__main__':
     output = sys.argv[1] if len(sys.argv) > 1 else 'barchart.png'
-    barChart(output)
+    barChart('v' + output, pycha.bar.VerticalBarChart)
+    barChart('h' + output, pycha.bar.HorizontalBarChart)
