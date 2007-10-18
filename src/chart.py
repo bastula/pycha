@@ -22,10 +22,24 @@ from pycha.color import defaultColorscheme, getColorscheme, hex2rgb
 class Chart(object):
 
     def __init__(self, surface, options={}):
+        # this flag is useful to reuse this chart for drawing different data
+        # or use different options
         self.resetFlag = False
 
-        # initialize storage hash
+        # initialize storage
         self.dataSets = []
+
+        # computed values used in several methods
+        self.area = None # chart area without padding or text labels
+        self.minxval = None
+        self.maxxval = None
+        self.minyval = None
+        self.maxyval = None
+        self.xscale = 1.0
+        self.yscale = 1.0
+        
+        self.xticks = []
+        self.yticks = []
 
         # set the default options
         self.options = Option(
@@ -85,19 +99,20 @@ class Chart(object):
             pieRadius=0.4,
             colorScheme=defaultColorscheme(self.getDataSetsKeys()),
         )
-        self.setOptions(options)
 
-        # initialize the canvas
-        self._initCanvas(surface)
+        # initialize the surface
+        self._initSurface(surface)
 
     def addDataset(self, dataset):
         """Adds an object containing chart data to the storage hash"""
         self.dataSets += dataset
 
     def getDataSetsKeys(self):
+        """Return the name of each data set"""
         return [d[0] for d in self.dataSets]
 
     def getDataSetsValues(self):
+        """Return the data (value) of each data set"""
         return [d[1] for d in self.dataSets]
 
     def setOptions(self, options={}):
@@ -118,7 +133,7 @@ class Chart(object):
         """
         self._update(options)
         if surface:
-            self._initCanvas(surface)
+            self._initSurface(surface)
         
         cx = cairo.Context(self.surface)
         self._renderBackground(cx)
@@ -127,10 +142,7 @@ class Chart(object):
         self._renderLegend(cx)
 
     def clean(self):
-        """Clears a canvas tag.
-        
-        This removes all renderings including axis, legends etc
-        """
+        """Clears the surface with a white background."""
         cx = cairo.Context(self.surface)
         cx.save()
         cx.set_source_rgb(1, 1, 1)
@@ -138,7 +150,9 @@ class Chart(object):
         cx.restore()
 
     def setColorscheme(self):
-        """Sets the colorScheme used for the chart"""
+        """Sets the colorScheme used for the chart using the color in the
+        options.colorScheme option
+        """
         scheme = self.options.colorScheme
         keys = self.getDataSetsKeys()
         if isinstance(scheme, dict):
@@ -150,27 +164,27 @@ class Chart(object):
         else:
             raise TypeError("Color scheme is invalid!")
 
-    def _initCanvas(self, surface):
+    def _initSurface(self, surface):
+        self.surface = surface
+
         if self.resetFlag:
             self.resetFlag = False
             self.clean()
         
-        self.surface = surface
 
     # update methods
     def _update(self, options={}):
-        """Everytime a chart is rendered, we need to evaluate metric for
-        the axis"""
+        """Update all the information needed to render the chart"""
         self.setOptions(options)
-        self.stores = self.getDataSetsValues()
-        self._updateXY()
         self.setColorscheme()
+        self._updateXY()
         self._updateChart()
         self._updateTicks()
 
     def _updateXY(self):
         """Calculates all kinds of metrics for the x and y axis"""
-        
+        stores = self.getDataSetsValues()
+
         # calculate area data
         width = (self.surface.get_width()
                  - self.options.padding.left - self.options.padding.right)
@@ -185,7 +199,7 @@ class Chart(object):
             self.minxval, self.maxxval = self.options.axis.x.range
             self.xscale = self.maxxval - self.minxval
         else:
-            xdata = [pair[0] for pair in reduce(lambda a,b: a+b, self.stores)]
+            xdata = [pair[0] for pair in reduce(lambda a,b: a+b, stores)]
             if self.options.xOriginIsZero:
                 self.minxval = 0.0 
             else:
@@ -203,7 +217,7 @@ class Chart(object):
             self.minyval, self.maxyval = self.options.axis.y.range
             self.yscale = self.maxyval - self.minyval
         else:
-            ydata = [pair[1] for pair in reduce(lambda a,b: a+b, self.stores)]
+            ydata = [pair[1] for pair in reduce(lambda a,b: a+b, stores)]
             if self.options.yOriginIsZero:
                 self.minyval = 0.0  
             else:
@@ -221,7 +235,8 @@ class Chart(object):
 
     def _updateTicks(self):
         """Evaluates ticks for x and y axis"""
-        
+        stores = self.getDataSetsValues()
+
         # evaluate xTicks
         self.xticks = []
         if self.options.axis.x.ticks:
@@ -237,7 +252,7 @@ class Chart(object):
                     self.xticks.append((pos, label))
 
         elif self.options.axis.x.tickCount > 0:
-            uniqx = range(len(uniqueIndices(self.stores)) + 1)
+            uniqx = range(len(uniqueIndices(stores)) + 1)
             roughSeparation = self.xrange / self.options.axis.x.tickCount
 
             i = j = 0
@@ -279,7 +294,7 @@ class Chart(object):
             
     # render methods
     def _renderBackground(self, cx):
-        """Renders the background of the chart"""
+        """Renders the background area of the chart"""
         if self.options.background.hide:
             return
         
@@ -301,6 +316,7 @@ class Chart(object):
             self._renderLine(cx, tick, False)
         
     def _renderLine(self, cx, tick, horiz):
+        """Aux function for _renderLines""" 
         x1, x2, y1, y2 = (0, 0, 0, 0)
         if horiz:
             x1 = x2 = tick[0] * self.area.w + self.area.x
@@ -331,7 +347,7 @@ class Chart(object):
         
         if not self.options.axis.y.hide:
             if self.yticks:
-                def collectYLabels(tick):
+                def drawYLabel(tick):
                     if callable(tick):
                         return
                     
@@ -353,7 +369,8 @@ class Chart(object):
                     cx.show_text(label)
                     
                     return label
-                self.ylabels = [collectYLabels(tick) for tick in self.yticks]
+                for tick in self.yticks:
+                    drawYLabel(tick)
                 
             cx.new_path()
             cx.move_to(self.area.x, self.area.y)
@@ -363,7 +380,7 @@ class Chart(object):
 
         if not self.options.axis.x.hide:
             if self.xticks:
-                def collectXLabels(tick):
+                def drawXLabel(tick):
                     if callable(tick):
                         return
                     
@@ -384,7 +401,8 @@ class Chart(object):
                                y + self.options.axis.tickSize + 10)
                     cx.show_text(label)
                     return label
-                self.xlabels = [collectXLabels(tick) for tick in self.xticks]
+                for tick in self.xticks:
+                    drawXLabel(tick)
             
             cx.new_path()
             cx.move_to(self.area.x, self.area.y + self.area.h)
@@ -444,10 +462,12 @@ def uniqueIndices(arr):
     return range(max([len(a) for a in arr]))
             
 class Area(object):
+    """Simple rectangle to hold an area coordinates and dimensions"""
     def __init__(self, x, y, w, h):
         self.x, self.y, self.w, self.h = x, y, w, h
 
 class Option(dict):
+    """Useful dict that allow attribute-like access to its keys"""
     def __getattr__(self, name):
         if name in self.keys():
             return self[name]
@@ -455,6 +475,7 @@ class Option(dict):
             raise AttributeError(name)
 
     def merge(self, other):
+        """Recursive merge with other Option or dict object"""
         for key, value in other.items():
             if self.has_key(key):
                 if isinstance(self[key], Option):

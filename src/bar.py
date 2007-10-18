@@ -63,7 +63,8 @@ class VerticalBarChart(BarChart):
 
     def _updateChart(self):
         """Evaluates measures for vertical bars"""
-        uniqx = uniqueIndices(self.stores)
+        stores = self.getDataSetsValues()
+        uniqx = uniqueIndices(stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
 
         barWidth = 0
@@ -74,7 +75,7 @@ class VerticalBarChart(BarChart):
             self.xscale = 1.0
             self.minxval = uniqx[0]
             barWidth = 1.0 * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(self.stores)
+            barWidthForSet = barWidth / len(stores)
             barMargin = (1.0 - self.options.barWidthFillFraction) / 2
         else:
             if self.xrange == 1:
@@ -85,7 +86,7 @@ class VerticalBarChart(BarChart):
                 self.xscale = (1.0 - 1 / self.xrange) / self.xrange
 
             barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(self.stores)
+            barWidthForSet = barWidth / len(stores)
             barMargin = (xdelta * self.xscale
                          * (1.0 - self.options.barWidthFillFraction)/2)
         
@@ -119,7 +120,8 @@ class HorizontalBarChart(BarChart):
 
     def _updateChart(self):
         """Evaluates measures for horizontal bars"""
-        uniqx = uniqueIndices(self.stores)
+        stores = self.getDataSetsValues()
+        uniqx = uniqueIndices(stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
 
         barWidth = 0
@@ -130,12 +132,12 @@ class HorizontalBarChart(BarChart):
             self.xscale = 1.0
             self.minxval = uniqx[0]
             barWidth = 1.0 * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(self.stores)
+            barWidthForSet = barWidth / len(stores)
             barMargin = (1.0 - self.options.barWidthFillFraction) / 2
         else:
             self.xscale = (1.0 - xdelta / self.xrange) / self.xrange
             barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(self.stores)
+            barWidthForSet = barWidth / len(stores)
             barMargin = xdelta * self.xscale * (1.0 - self.options.barWidthFillFraction) / 2
         
         self.minxdelta = xdelta
