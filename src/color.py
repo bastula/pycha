@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
+DEFAULT_COLOR = '#3c581a'
+
 def clamp(minValue, maxValue, value):
     if value < minValue:
         return minValue
@@ -22,13 +24,14 @@ def clamp(minValue, maxValue, value):
         return maxValue
     return value
     
-def hex2rgb(hexstring, top=255.0):
+def hex2rgb(hexstring, digits=2):
     if isinstance(hexstring, (tuple, list)):
         return hexstring
 
-    r = int(hexstring[1:3], 16)
-    g = int(hexstring[3:5], 16)
-    b = int(hexstring[5:7], 16)
+    top = float(int(digits * 'f', 16))
+    r = int(hexstring[1:digits+1], 16)
+    g = int(hexstring[digits+1:digits*2+1], 16)
+    b = int(hexstring[digits*2+1:digits*3+1], 16)
     return r / top, g / top, b / top
 
 def lighten(r, g, b, amount):
@@ -36,24 +39,20 @@ def lighten(r, g, b, amount):
             clamp(0.0, 1.0, g + amount),
             clamp(0.0, 1.0, b + amount))
     
-def generateColorscheme(hex, keys):
+def generateColorscheme(hex, keys, light=0.098):
     r, g, b = hex2rgb(hex)
-    light = 0.098
-    scheme = {}
-    for key in keys:
-        scheme[key] = lighten(r, g, b, light)
-        light += 0.098
-    return scheme
+    return dict([(key, lighten(r, g, b, light * i))
+                 for i, key in enumerate(keys)])
 
 def defaultColorscheme(keys):
-    return generateColorscheme('#3c581a', keys)
+    return generateColorscheme(DEFAULT_COLOR, keys)
 
 def getColorscheme(color, keys):
     return generateColorscheme(colorSchemes.get(color, color), keys)
 
 colorSchemes = dict(
     red='#6d1d1d',
-    green='#3c581a',
+    green=DEFAULT_COLOR,
     blue='#224565',
     grey='#444444',
     black='#000000',
