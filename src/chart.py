@@ -186,11 +186,17 @@ class Chart(object):
             self.xscale = self.maxxval - self.minxval
         else:
             xdata = [pair[0] for pair in reduce(lambda a,b: a+b, self.stores)]
-            self.minxval = 0.0 if self.options.xOriginIsZero else float(min(xdata))
+            if self.options.xOriginIsZero:
+                self.minxval = 0.0 
+            else:
+                self.minxval = float(min(xdata))
             self.maxxval = float(max(xdata))
 
-        self.xrange = self.maxxval - self.minxval
-        self.xscale = 1.0 if self.xrange == 0 else 1 / self.xrange
+        self.xrange = self.maxxval - self.minxval        
+        if self.xrange == 0:
+            self.xscale = 1.0 
+        else:
+            self.xscale = 1 / self.xrange
 
         # gather data for the y axis
         if self.options.axis.y.range:
@@ -198,11 +204,17 @@ class Chart(object):
             self.yscale = self.maxyval - self.minyval
         else:
             ydata = [pair[1] for pair in reduce(lambda a,b: a+b, self.stores)]
-            self.minyval = 0.0 if self.options.yOriginIsZero else float(min(ydata))
+            if self.options.yOriginIsZero:
+                self.minyval = 0.0  
+            else:
+                self.minyval = float(min(ydata))
             self.maxyval = float(max(ydata))
 
         self.yrange = self.maxyval - self.minyval
-        self.yscale = 1.0 if self.yrange == 0 else 1 / self.yrange
+        if self.yrange == 0:
+            self.yscale = 1.0 
+        else:
+            self.yscale = 1 / self.yrange
 
     def _updateChart(self):
         raise NotImplementedError
@@ -216,7 +228,10 @@ class Chart(object):
             for tick in self.options.axis.x.ticks:
                 if not isinstance(tick, Option):
                     tick = Option(tick)
-                label = str(tick.v) if tick.label is None else tick.label
+                if tick.label is None:
+                    label = str(tick.v)
+                else: 
+                    label = tick.label
                 pos = self.xscale * (tick.v - self.minxval)
                 if 0.0 <= pos <= 1.0:
                     self.xticks.append((pos, label))
@@ -240,7 +255,10 @@ class Chart(object):
             for tick in self.options.y.ticks:
                 if not isinstance(tick, Option):
                     tick = Option(tick)
-                label = str(tick.v) if tick.label is None else tick.label
+                if tick.label is None:
+                    label = str(tick.v)  
+                else:
+                    label = tick.label
                 pos = self.yscale * (tick.v - self.minyval)
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, label))
@@ -248,7 +266,10 @@ class Chart(object):
         elif self.options.axis.y.tickCount > 0:
             prec = self.options.axis.y.tickPrecision
             num = self.yrange / self.options.axis.y.tickCount
-            roughSeparation = 1 if (num < 1 and prec == 0) else round(num, prec)
+            if (num < 1 and prec == 0):
+                roughSeparation = 1
+            else:
+                roughSeparation = round(num, prec)
             
             for i in range(self.options.axis.y.tickCount + 1):
                 yval = self.minyval + (i * roughSeparation)
