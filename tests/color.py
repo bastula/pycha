@@ -91,5 +91,10 @@ class ColorTests(unittest.TestCase):
         for color in colors:
             self.assert_(pycha.color.colorSchemes.has_key(color))
 
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite(ColorTests),
+    ))
+
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(defaultTest='test_suite')
