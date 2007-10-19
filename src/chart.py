@@ -459,6 +459,7 @@ class Chart(object):
         cx.restore()
 
 def uniqueIndices(arr):
+    """Return a list with the indexes of the biggest element of arr"""
     return range(max([len(a) for a in arr]))
             
 class Area(object):
