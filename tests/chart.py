@@ -19,11 +19,35 @@ import unittest
 
 import pycha.chart
 
+class FunctionsTests(unittest.TestCase):
+    
+    def test_uniqueIndices(self):
+        arr = (range(10), range(5), range(20), range(30))
+        self.assertEqual(pycha.chart.uniqueIndices(arr), range(30))
+
+        arr = (range(4),)
+        self.assertEqual(pycha.chart.uniqueIndices(arr), range(4))
+
+class AreaTests(unittest.TestCase):
+    
+    def test_area(self):
+        area = pycha.chart.Area(10, 20, 100, 300)
+        self.assertEqual(area.x, 10)
+        self.assertEqual(area.y, 20)
+        self.assertEqual(area.w, 100)
+        self.assertEqual(area.h, 300)
+
+class OptionTests(unittest.TestCase):
+    pass
+
 class ChartTests(unittest.TestCase):
     pass
 
 def test_suite():
     return unittest.TestSuite((
+        unittest.makeSuite(FunctionsTests),
+        unittest.makeSuite(AreaTests),
+        unittest.makeSuite(OptionTests),
         unittest.makeSuite(ChartTests),
     ))
 
