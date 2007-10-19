@@ -57,7 +57,7 @@ def generateColorscheme(masterColor, keys, light=0.098):
 
     The masterColor is given in a hex string format.
     """
-    r, g, b = hex2rgb(hex)
+    r, g, b = hex2rgb(masterColor)
     return dict([(key, lighten(r, g, b, light * i))
                  for i, key in enumerate(keys)])
 
