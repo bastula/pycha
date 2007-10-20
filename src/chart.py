@@ -45,6 +45,8 @@ class Chart(object):
 
         # set the default options
         self.options = copy.deepcopy(DEFAULT_OPTIONS)
+        if options:
+            self.options.merge(options)
 
         # initialize the surface
         self._initSurface(surface)
@@ -68,7 +70,7 @@ class Chart(object):
     def reset(self):
         """Resets options and datasets"""
         self.resetFlag = True
-        self.setOptions()
+        self.options = copy.deepcopy(DEFAULT_OPTIONS)
         self.datasets = []
 
     def render(self, surface=None, options={}):

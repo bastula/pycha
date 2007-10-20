@@ -96,7 +96,28 @@ class ChartTests(unittest.TestCase):
                          ['dataset1', 'dataset2', 'dataset3'])
         self.assertEqual(ch._getDatasetsValues(),
                          [d1[1], d2[1], d3[1]])
+    
+    def test_options(self):
+        ch = pycha.chart.Chart(None)
+        opt = pycha.chart.Option(shouldFill=False)
+        ch.setOptions(opt)
+        self.assertEqual(ch.options.shouldFill, False)
 
+        opt = {'pieRadius': 0.8}
+        ch.setOptions(opt)
+        self.assertEqual(ch.options.pieRadius, 0.8)
+
+    def test_reset(self):
+        ch = pycha.chart.Chart(None, options={'shouldFill': False})
+        self.assertEqual(ch.options.shouldFill, False)
+        dataset = (('dataset1', ([0, 1], [1, 1])),)
+        ch.addDataset(dataset)
+        self.assertEqual(ch._getDatasetsKeys(), ['dataset1'])
+        ch.reset()
+        defaultFill = pycha.chart.DEFAULT_OPTIONS.shouldFill
+        self.assertEqual(ch.options.shouldFill, defaultFill)
+        self.assertEqual(ch.datasets, [])
+        
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FunctionsTests),
