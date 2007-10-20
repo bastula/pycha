@@ -63,7 +63,7 @@ class VerticalBarChart(BarChart):
 
     def _updateChart(self):
         """Evaluates measures for vertical bars"""
-        stores = self.getDataSetsValues()
+        stores = self._getDatasetsValues()
         uniqx = uniqueIndices(stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
 
@@ -120,7 +120,7 @@ class HorizontalBarChart(BarChart):
 
     def _updateChart(self):
         """Evaluates measures for horizontal bars"""
-        stores = self.getDataSetsValues()
+        stores = self._getDatasetsValues()
         uniqx = uniqueIndices(stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
 
