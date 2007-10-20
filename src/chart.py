@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
 import cairo
 
-from pycha.color import defaultColorscheme, getColorscheme, hex2rgb
+from pycha.color import (defaultColorscheme, getColorscheme, hex2rgb,
+                         DEFAULT_COLOR)
 
 class Chart(object):
 
@@ -42,63 +44,7 @@ class Chart(object):
         self.yticks = []
 
         # set the default options
-        self.options = Option(
-            axis=Option(
-                lineWidth=1.0,
-                lineColor='#000000',
-                tickSize=3.0,
-                labelColor='#666666',
-                labelFont='Tahoma',
-                labelFontSize=9,
-                labelWidth=50.0,
-                x=Option(
-                    hide=False,
-                    ticks=None,
-                    tickCount=10,
-                    tickPrecision=1,
-                    range=None,
-                ),
-                y=Option(
-                    hide=False,
-                    ticks=None,
-                    tickCount=10,
-                    tickPrecision=1,
-                    range=None,
-                ),
-            ),
-            background=Option(
-                color='#f5f5f5',
-                hide=False,
-                lineColor='#ffffff',
-                lineWidth=1.5,
-            ),
-            legend=Option(
-                opacity=0.8,
-                borderColor='#000000',
-                style={},
-                hide=False,
-                position=Option(top=20, left=40),
-            ),
-            padding=Option(
-                left=30,
-                right=30,
-                top=15,
-                bottom=15,
-            ),
-            stroke=Option(
-                color='#ffffff',
-                hide=False,
-                shadow=True,
-                width=2
-            ),
-            fillOpacity=1.0,
-            shouldFill=True,
-            barWidthFillFraction=0.75,
-            xOriginIsZero=True,
-            yOriginIsZero=True,
-            pieRadius=0.4,
-            colorScheme=defaultColorscheme(self.getDataSetsKeys()),
-        )
+        self.options = copy.deepcopy(DEFAULT_OPTIONS)
 
         # initialize the surface
         self._initSurface(surface)
@@ -483,3 +429,61 @@ class Option(dict):
                     self[key].merge(other[key])
                 else:
                     self[key] = other[key]
+
+DEFAULT_OPTIONS = Option(
+    axis=Option(
+        lineWidth=1.0,
+        lineColor='#000000',
+        tickSize=3.0,
+        labelColor='#666666',
+        labelFont='Tahoma',
+        labelFontSize=9,
+        labelWidth=50.0,
+        x=Option(
+            hide=False,
+            ticks=None,
+            tickCount=10,
+            tickPrecision=1,
+            range=None,
+        ),
+        y=Option(
+            hide=False,
+            ticks=None,
+            tickCount=10,
+            tickPrecision=1,
+            range=None,
+        ),
+    ),
+    background=Option(
+        color='#f5f5f5',
+        hide=False,
+        lineColor='#ffffff',
+        lineWidth=1.5,
+    ),
+    legend=Option(
+        opacity=0.8,
+        borderColor='#000000',
+        style={},
+        hide=False,
+        position=Option(top=20, left=40),
+    ),
+    padding=Option(
+        left=30,
+        right=30,
+        top=15,
+        bottom=15,
+    ),
+    stroke=Option(
+        color='#ffffff',
+        hide=False,
+        shadow=True,
+        width=2
+    ),
+    fillOpacity=1.0,
+    shouldFill=True,
+    barWidthFillFraction=0.75,
+    xOriginIsZero=True,
+    yOriginIsZero=True,
+    pieRadius=0.4,
+    colorScheme=DEFAULT_COLOR,
+)
