@@ -79,7 +79,7 @@ dimensions:
 
    import cairo
    width, height = (500, 400)
-   surface = cairo.Surface(cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+   surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
 
 Then you should create your data set querying a database or any other data
 source::
@@ -112,7 +112,7 @@ legend and use a different color for the background::
 Now we are ready to instantiate the chart, add the data set and render it::
 
    chart = pycha.bar.VerticalBarChart(surface, options)
-   chart.addDataSet(dataSet)
+   chart.addDataset(dataSet)
    chart.render()
 
 
