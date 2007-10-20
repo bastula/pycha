@@ -93,7 +93,7 @@ class VerticalBarChart(BarChart):
         self.minxdelta = xdelta
         self.bars = []
         
-        for i, (name, store) in enumerate(self.dataSets):
+        for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
                 x = (((xval - self.minxval) * self.xscale)
@@ -143,7 +143,7 @@ class HorizontalBarChart(BarChart):
         self.minxdelta = xdelta
         self.bars = []
 
-        for i, (name, store) in enumerate(self.dataSets):
+        for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
                 y = ((xval - self.minxval) * self.xscale) + (i * barWidthForSet) + barMargin

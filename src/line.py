@@ -28,7 +28,7 @@ class LineChart(Chart):
         """Evaluates measures for line charts"""
         self.points = []
 
-        for i, (name, store) in enumerate(self.dataSets):
+        for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
                 x = (xval - self.minxval) * self.xscale
@@ -82,10 +82,10 @@ class LineChart(Chart):
                     cx.stroke()
 
             # draw the lines
-            for key in self.getDataSetsKeys():
+            for key in self._getDatasetsKeys():
                 drawLine(key)
         else:
-            for key in self.getDataSetsKeys():
+            for key in self._getDatasetsKeys():
                 preparePath(key)
 
         cx.restore()

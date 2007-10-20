@@ -37,7 +37,7 @@ class PieChart(Chart):
 
         slices = [dict(name=key,
                        value=(i, value[0][1]))
-                  for i, (key, value) in enumerate(self.dataSets)]
+                  for i, (key, value) in enumerate(self.datasets)]
 
         s = float(sum([slice['value'][1] for slice in slices]))
 

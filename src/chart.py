@@ -29,7 +29,7 @@ class Chart(object):
         self.resetFlag = False
 
         # initialize storage
-        self.dataSets = []
+        self.datasets = []
 
         # computed values used in several methods
         self.area = None # chart area without padding or text labels
@@ -51,15 +51,15 @@ class Chart(object):
 
     def addDataset(self, dataset):
         """Adds an object containing chart data to the storage hash"""
-        self.dataSets += dataset
+        self.datasets += dataset
 
-    def getDataSetsKeys(self):
+    def _getDatasetsKeys(self):
         """Return the name of each data set"""
-        return [d[0] for d in self.dataSets]
+        return [d[0] for d in self.datasets]
 
-    def getDataSetsValues(self):
+    def _getDatasetsValues(self):
         """Return the data (value) of each data set"""
-        return [d[1] for d in self.dataSets]
+        return [d[1] for d in self.datasets]
 
     def setOptions(self, options={}):
         """Sets options of this chart"""
@@ -69,7 +69,7 @@ class Chart(object):
         """Resets options and datasets"""
         self.resetFlag = True
         self.setOptions()
-        self.dataSets = []
+        self.datasets = []
 
     def render(self, surface=None, options={}):
         """Renders the chart with the specified options.
@@ -100,7 +100,7 @@ class Chart(object):
         options.colorScheme option
         """
         scheme = self.options.colorScheme
-        keys = self.getDataSetsKeys()
+        keys = self._getDatasetsKeys()
         if isinstance(scheme, dict):
             if not scheme:
                 self.options.colorScheme = defaultColorscheme(keys)
@@ -129,7 +129,7 @@ class Chart(object):
 
     def _updateXY(self):
         """Calculates all kinds of metrics for the x and y axis"""
-        stores = self.getDataSetsValues()
+        stores = self._getDatasetsValues()
 
         # calculate area data
         width = (self.surface.get_width()
@@ -181,7 +181,7 @@ class Chart(object):
 
     def _updateTicks(self):
         """Evaluates ticks for x and y axis"""
-        stores = self.getDataSetsValues()
+        stores = self._getDatasetsValues()
 
         # evaluate xTicks
         self.xticks = []
@@ -367,8 +367,8 @@ class Chart(object):
         bullet = 15
         width = 0
         height = padding
-        keys = self.getDataSetsKeys()
-        for key in self.getDataSetsKeys():
+        keys = self._getDatasetsKeys()
+        for key in keys:
             extents = cx.text_extents(key)
             width = max(extents[2], width)
             height += max(extents[3], bullet) + padding

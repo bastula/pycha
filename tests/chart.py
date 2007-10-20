@@ -74,7 +74,7 @@ class ChartTests(unittest.TestCase):
     def test_init(self):
         ch = pycha.chart.Chart(None)
         self.assertEqual(ch.resetFlag, False)
-        self.assertEqual(ch.dataSets, [])
+        self.assertEqual(ch.datasets, [])
         self.assertEqual(ch.area, None)
         self.assertEqual(ch.minxval, None)
         self.assertEqual(ch.maxxval, None)
