@@ -85,6 +85,17 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.xticks, [])
         self.assertEqual(ch.yticks, [])
         self.assertEqual(ch.options, pycha.chart.DEFAULT_OPTIONS)
+    
+    def test_datasets(self):
+        ch = pycha.chart.Chart(None)
+        d1 = ('dataset1', ([0,0], [1,2], [2,1.5]))
+        d2 = ('dataset2', ([0,1], [1,2], [2,2.4]))
+        d3 = ('dataset3', ([0,4], [1,3], [2,0.5]))
+        ch.addDataset((d1, d2, d3))
+        self.assertEqual(ch._getDatasetsKeys(),
+                         ['dataset1', 'dataset2', 'dataset3'])
+        self.assertEqual(ch._getDatasetsValues(),
+                         [d1[1], d2[1], d3[1]])
 
 def test_suite():
     return unittest.TestSuite((
