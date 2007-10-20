@@ -68,11 +68,23 @@ class OptionTests(unittest.TestCase):
         opt.merge(pycha.chart.Option(a=10, b=20))
         self.assertEqual(opt.a, 10)
         self.assertEqual(opt.b, 20)
-        
-
 
 class ChartTests(unittest.TestCase):
-    pass
+    
+    def test_init(self):
+        ch = pycha.chart.Chart(None)
+        self.assertEqual(ch.resetFlag, False)
+        self.assertEqual(ch.dataSets, [])
+        self.assertEqual(ch.area, None)
+        self.assertEqual(ch.minxval, None)
+        self.assertEqual(ch.maxxval, None)
+        self.assertEqual(ch.minyval, None)
+        self.assertEqual(ch.maxyval, None)
+        self.assertEqual(ch.xscale, 1.0)
+        self.assertEqual(ch.yscale, 1.0)
+        self.assertEqual(ch.xticks, [])
+        self.assertEqual(ch.yticks, [])
+        self.assertEqual(ch.options, pycha.chart.DEFAULT_OPTIONS)
 
 def test_suite():
     return unittest.TestSuite((
