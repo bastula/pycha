@@ -25,8 +25,14 @@ class FunctionsTests(unittest.TestCase):
         arr = (range(10), range(5), range(20), range(30))
         self.assertEqual(pycha.chart.uniqueIndices(arr), range(30))
 
+        arr = (range(30), range(20), range(5), range(10))
+        self.assertEqual(pycha.chart.uniqueIndices(arr), range(30))
+
         arr = (range(4),)
         self.assertEqual(pycha.chart.uniqueIndices(arr), range(4))
+
+        arr = (range(0),)
+        self.assertEqual(pycha.chart.uniqueIndices(arr), [])
 
 class AreaTests(unittest.TestCase):
     
@@ -38,7 +44,32 @@ class AreaTests(unittest.TestCase):
         self.assertEqual(area.h, 300)
 
 class OptionTests(unittest.TestCase):
-    pass
+    
+    def test_options(self):
+        opt = pycha.chart.Option(a=1, b=2, c=3)
+        self.assertEqual(opt.a, opt['a'])
+        self.assertEqual(opt.b, 2)
+        self.assertEqual(opt['c'], 3)
+
+        opt = pycha.chart.Option({'a':1, 'b':2, 'c':3})
+        self.assertEqual(opt.a, opt['a'])
+        self.assertEqual(opt.b, 2)
+        self.assertEqual(opt['c'], 3)
+
+    def test_merge(self):
+        opt = pycha.chart.Option(a=1, b=2,
+                                 c=pycha.chart.Option(d=4, e=5))
+        self.assertEqual(opt.c.d, 4)
+        opt.merge(dict(c=pycha.chart.Option(d=7, e=8, f=9)))
+        self.assertEqual(opt.c.d, 7)
+        # new attributes not present in original option are not merged
+        self.assertRaises(AttributeError, getattr, opt.c, 'f')
+        
+        opt.merge(pycha.chart.Option(a=10, b=20))
+        self.assertEqual(opt.a, 10)
+        self.assertEqual(opt.b, 20)
+        
+
 
 class ChartTests(unittest.TestCase):
     pass
