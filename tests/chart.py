@@ -17,6 +17,8 @@
 
 import unittest
 
+import cairo
+
 import pycha.chart
 
 class FunctionsTests(unittest.TestCase):
@@ -109,6 +111,7 @@ class ChartTests(unittest.TestCase):
 
     def test_reset(self):
         ch = pycha.chart.Chart(None, options={'shouldFill': False})
+        self.assertEqual(ch.resetFlag, False)
         self.assertEqual(ch.options.shouldFill, False)
         dataset = (('dataset1', ([0, 1], [1, 1])),)
         ch.addDataset(dataset)
@@ -117,7 +120,47 @@ class ChartTests(unittest.TestCase):
         defaultFill = pycha.chart.DEFAULT_OPTIONS.shouldFill
         self.assertEqual(ch.options.shouldFill, defaultFill)
         self.assertEqual(ch.datasets, [])
-        
+        self.assertEqual(ch.resetFlag, True)
+
+    def test_colorscheme(self):
+        ch = pycha.chart.Chart(None, {'colorScheme': '#000000'})
+        dataset = (('dataset1', ([0, 1], [1, 1])),)
+        ch.addDataset(dataset)
+        ch._setColorscheme()
+        self.assert_(isinstance(ch.options.colorScheme, dict))
+        self.assertEqual(ch.options.colorScheme, {'dataset1': (0.0, 0.0, 0.0)})
+
+        ch = pycha.chart.Chart(None, {'colorScheme': {}})
+        ch.addDataset(dataset)
+        ch._setColorscheme()
+        self.assert_(isinstance(ch.options.colorScheme, dict))
+        self.assertEqual(ch.options.colorScheme.keys(), ['dataset1'])
+
+        ch = pycha.chart.Chart(None, {'colorScheme': (0.0, 0.0, 0.0)})
+        self.assertRaises(TypeError, ch._setColorscheme)
+    
+    def test_updateXY(self):
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+        opt = {'padding': dict(left=10, right=10, top=10, bottom=10)}
+        dataset = (
+            ('dataset1', ([0, 1], [1, 1], [2, 3])),
+            ('dataset2', ([0, 2], [1, 0], [3, 4])),
+            )
+        ch = pycha.chart.Chart(surface, opt)
+        ch.addDataset(dataset)
+        ch._updateXY()
+        self.assertEqual((ch.area.x, ch.area.y, ch.area.w, ch.area.h),
+                         (10,  10, 480, 480))
+        self.assertEqual(ch.minxval, 0.0)
+        self.assertEqual(ch.maxxval, 3)
+        self.assertEqual(ch.xrange, 3)
+        self.assertEqual(ch.xscale, 1/3.0)
+
+        self.assertEqual(ch.minyval, 0)
+        self.assertEqual(ch.maxyval, 4)
+        self.assertEqual(ch.yrange, 4)
+        self.assertEqual(ch.yscale, 1/4.0)
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FunctionsTests),

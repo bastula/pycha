@@ -68,7 +68,10 @@ class Chart(object):
         self.options.merge(options)
 
     def reset(self):
-        """Resets options and datasets"""
+        """Resets options and datasets.
+
+        In the next render the surface will be cleaned before any drawing.
+        """
         self.resetFlag = True
         self.options = copy.deepcopy(DEFAULT_OPTIONS)
         self.datasets = []
@@ -106,7 +109,6 @@ class Chart(object):
         if isinstance(scheme, dict):
             if not scheme:
                 self.options.colorScheme = defaultColorscheme(keys)
-            return
         elif isinstance(scheme, basestring):
             self.options.colorScheme = getColorscheme(scheme, keys)
         else:
