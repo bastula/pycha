@@ -17,20 +17,16 @@
 
 import unittest
 
-import bar
-import chart
-import color
-import line
-import pie
+import pycha.line
+
+class LineTests(unittest.TestCase):
+    pass
 
 def test_suite():
     return unittest.TestSuite((
-        bar.test_suite(),
-        chart.test_suite(),
-        color.test_suite(),
-        line.test_suite(),
-        pie.test_suite(),
+        unittest.makeSuite(LineTests),
     ))
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
+
