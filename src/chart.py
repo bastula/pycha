@@ -97,7 +97,7 @@ class Chart(object):
         cx.paint()
         cx.restore()
 
-    def setColorscheme(self):
+    def _setColorscheme(self):
         """Sets the colorScheme used for the chart using the color in the
         options.colorScheme option
         """
@@ -124,7 +124,7 @@ class Chart(object):
     def _update(self, options={}):
         """Update all the information needed to render the chart"""
         self.setOptions(options)
-        self.setColorscheme()
+        self._setColorscheme()
         self._updateXY()
         self._updateChart()
         self._updateTicks()
