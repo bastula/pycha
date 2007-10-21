@@ -84,6 +84,8 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.maxyval, None)
         self.assertEqual(ch.xscale, 1.0)
         self.assertEqual(ch.yscale, 1.0)
+        self.assertEqual(ch.xrange, None)
+        self.assertEqual(ch.yrange, None)
         self.assertEqual(ch.xticks, [])
         self.assertEqual(ch.yticks, [])
         self.assertEqual(ch.options, pycha.chart.DEFAULT_OPTIONS)
@@ -160,6 +162,36 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.maxyval, 4)
         self.assertEqual(ch.yrange, 4)
         self.assertEqual(ch.yscale, 1/4.0)
+        
+        # TODO: test with different options (xOriginIsZero, axis.range, ...)
+
+    def test_updateTicks(self):
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+        opt = {'padding': dict(left=10, right=10, top=10, bottom=10)}
+        dataset = (
+            ('dataset1', ([0, 1], [1, 1], [2, 3])),
+            ('dataset2', ([0, 2], [1, 0], [3, 4])),
+            )
+        ch = pycha.chart.Chart(surface, opt)
+        ch.addDataset(dataset)
+        ch._updateXY()
+        ch._updateTicks()
+        xticks = [(0.0, 1), (1/3.0, 2), (2/3.0, 3)]
+        for i in range(len(xticks)):
+            self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
+            self.assertAlmostEqual(ch.xticks[i][1], xticks[i][1], 4)
+
+        yticks = [(1 - 0.1 * i, 0.4*i)
+                  for i in range(ch.options.axis.y.tickCount + 1)]
+        self.assertEqual(len(ch.yticks), len(yticks))
+        for i in range(len(yticks)):
+            self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
+            self.assertAlmostEqual(ch.yticks[i][1], yticks[i][1], 4)
+
+    def test_abstractChart(self):
+        ch = pycha.chart.Chart(None)
+        self.assertRaises(NotImplementedError, ch._updateChart)
+        self.assertRaises(NotImplementedError, ch._renderChart, None)
 
 def test_suite():
     return unittest.TestSuite((

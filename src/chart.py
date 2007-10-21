@@ -39,6 +39,8 @@ class Chart(object):
         self.maxyval = None
         self.xscale = 1.0
         self.yscale = 1.0
+        self.xrange = None
+        self.yrange = None
         
         self.xticks = []
         self.yticks = []
@@ -184,7 +186,12 @@ class Chart(object):
         raise NotImplementedError
 
     def _updateTicks(self):
-        """Evaluates ticks for x and y axis"""
+        """Evaluates ticks for x and y axis.
+        
+        You should call _updateXY before because that method computes the
+        values of xscale, minxval, yscale, and other attributes needed for
+        this method.
+        """
         stores = self._getDatasetsValues()
 
         # evaluate xTicks
