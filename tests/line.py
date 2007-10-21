@@ -47,42 +47,22 @@ class LineTests(unittest.TestCase):
         ch.addDataset(dataset)
         ch._updateXY()
         ch._updateChart()
-        self.assertEqual(len(ch.points), 6)
-        self.assertEqual(ch.points[0].xval, 0)
-        self.assertEqual(ch.points[0].yval, 1)
-        self.assertEqual(ch.points[0].x, 0)
-        self.assertEqual(ch.points[0].y, 1 - 0.25)
-        self.assertEqual(ch.points[0].name, 'dataset1')
-
-        self.assertEqual(ch.points[1].xval, 1)
-        self.assertEqual(ch.points[1].yval, 1)
-        self.assertEqual(ch.points[1].x, 1/3.0)
-        self.assertEqual(ch.points[1].y, 0.75)
-        self.assertEqual(ch.points[1].name, 'dataset1')
-
-        self.assertEqual(ch.points[2].xval, 2)
-        self.assertEqual(ch.points[2].yval, 3)
-        self.assertEqual(ch.points[2].x, 2/3.0)
-        self.assertEqual(ch.points[2].y, 0.25)
-        self.assertEqual(ch.points[2].name, 'dataset1')
-
-        self.assertEqual(ch.points[3].xval, 0)
-        self.assertEqual(ch.points[3].yval, 2)
-        self.assertEqual(ch.points[3].x, 0)
-        self.assertEqual(ch.points[3].y, 0.5)
-        self.assertEqual(ch.points[3].name, 'dataset2')
-        
-        self.assertEqual(ch.points[4].xval, 1)
-        self.assertEqual(ch.points[4].yval, 0)
-        self.assertEqual(ch.points[4].x, 1/3.0)
-        self.assertEqual(ch.points[4].y, 1)
-        self.assertEqual(ch.points[4].name, 'dataset2')
-
-        self.assertEqual(ch.points[5].xval, 3)
-        self.assertEqual(ch.points[5].yval, 4)
-        self.assertEqual(ch.points[5].x, 1)
-        self.assertEqual(ch.points[5].y, 0)
-        self.assertEqual(ch.points[5].name, 'dataset2')
+                
+        points = (
+            pycha.line.Point(0, 0.75, 0, 1, 'dataset1'),
+            pycha.line.Point(1/3.0, 0.75, 1, 1, 'dataset1'),
+            pycha.line.Point(2/3.0, 0.25, 2, 3, 'dataset1'),
+            pycha.line.Point(0, 0.5, 0, 2, 'dataset2'),
+            pycha.line.Point(1/3.0, 1, 1, 0, 'dataset2'),
+            pycha.line.Point(1, 0, 3, 4, 'dataset2'),
+        )
+        for i, point in enumerate(points):
+            p1, p2 = ch.points[i], point
+            self.assertEqual(p1.x, p2.x)
+            self.assertEqual(p1.y, p2.y)
+            self.assertAlmostEqual(p1.xval, p2.xval, 4)
+            self.assertAlmostEqual(p1.yval, p2.yval, 4)
+            self.assertEqual(p1.name, p2.name)
 
 def test_suite():
     return unittest.TestSuite((
