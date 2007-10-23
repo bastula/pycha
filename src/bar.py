@@ -23,6 +23,7 @@ class BarChart(Chart):
     def __init__(self, surface=None, options={}):
         super(BarChart, self).__init__(surface, options)
         self.bars = []
+        self.minxdelta = 0
 
     def _renderChart(self, cx):
         """Renders a horizontal/vertical bar chart"""
@@ -92,7 +93,7 @@ class VerticalBarChart(BarChart):
         
         self.minxdelta = xdelta
         self.bars = []
-        
+
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
@@ -109,8 +110,8 @@ class VerticalBarChart(BarChart):
     def _updateTicks(self):
         """Evaluates bar ticks"""
         super(BarChart, self)._updateTicks()
-        self.xticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
-                        tick[1]) for tick in self.xticks]
+        offset = (self.minxdelta * self.xscale) / 2
+        self.xticks = [(tick[0] + offset, tick[1]) for tick in self.xticks]
 
     def _getShadowRectangle(self, x, y, w, h):
         return (x-2, y-2, w+4, h+2)
@@ -123,7 +124,6 @@ class HorizontalBarChart(BarChart):
         stores = self._getDatasetsValues()
         uniqx = uniqueIndices(stores)
         xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
-
         barWidth = 0
         barWidthForSet = 0
         barMargin = 0
@@ -159,11 +159,10 @@ class HorizontalBarChart(BarChart):
     def _updateTicks(self):
         """Evaluates bar ticks"""
         super(BarChart, self)._updateTicks()
+        offset = (self.minxdelta * self.xscale) / 2
         tmp = self.xticks
         self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
-        self.yticks = [(tick[0] + (self.minxdelta * self.xscale) / 2,
-                        tick[1]) for tick in tmp]
-
+        self.yticks = [(tick[0] + offset, tick[1]) for tick in tmp]
 
     def _renderLines(self, cx):
         """Aux function for _renderBackground"""
