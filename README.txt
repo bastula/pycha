@@ -130,3 +130,12 @@ the cairo library::
 
 That's it! You can see more examples in the examples directory of the source
 code.
+
+Development
+-----------
+
+You can get the last bleeding edge version of pycha by getting a checkout of
+the subversion repository::
+
+   svn co http://www.lorenzogil.com/svn/pycha/trunk pycha
+
