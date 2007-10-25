@@ -27,6 +27,9 @@ class PieChart(Chart):
     def __init__(self, surface=None, options={}):
         super(PieChart, self).__init__(surface, options)
         self.slices = []
+        self.centerx = 0
+        self.centery = 0
+        self.radius = 0
 
     def _updateChart(self):
         """Evaluates measures for pie charts"""
