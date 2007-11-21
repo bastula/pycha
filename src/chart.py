@@ -41,7 +41,7 @@ class Chart(object):
         self.yscale = 1.0
         self.xrange = None
         self.yrange = None
-        
+
         self.xticks = []
         self.yticks = []
 
@@ -80,14 +80,14 @@ class Chart(object):
 
     def render(self, surface=None, options={}):
         """Renders the chart with the specified options.
-        
+
         The optional parameters can be used to render a chart in a different
         surface with new options.
         """
         self._update(options)
         if surface:
             self._initSurface(surface)
-        
+
         cx = cairo.Context(self.surface)
         self._renderBackground(cx)
         self._renderChart(cx)
@@ -122,7 +122,7 @@ class Chart(object):
         if self.resetFlag:
             self.resetFlag = False
             self.clean()
-        
+
 
     # update methods
     def _update(self, options={}):
@@ -153,14 +153,14 @@ class Chart(object):
         else:
             xdata = [pair[0] for pair in reduce(lambda a,b: a+b, stores)]
             if self.options.xOriginIsZero:
-                self.minxval = 0.0 
+                self.minxval = 0.0
             else:
                 self.minxval = float(min(xdata))
             self.maxxval = float(max(xdata))
 
-        self.xrange = self.maxxval - self.minxval        
+        self.xrange = self.maxxval - self.minxval
         if self.xrange == 0:
-            self.xscale = 1.0 
+            self.xscale = 1.0
         else:
             self.xscale = 1 / self.xrange
 
@@ -171,14 +171,14 @@ class Chart(object):
         else:
             ydata = [pair[1] for pair in reduce(lambda a,b: a+b, stores)]
             if self.options.yOriginIsZero:
-                self.minyval = 0.0  
+                self.minyval = 0.0
             else:
                 self.minyval = float(min(ydata))
             self.maxyval = float(max(ydata))
 
         self.yrange = self.maxyval - self.minyval
         if self.yrange == 0:
-            self.yscale = 1.0 
+            self.yscale = 1.0
         else:
             self.yscale = 1 / self.yrange
 
@@ -187,7 +187,7 @@ class Chart(object):
 
     def _updateTicks(self):
         """Evaluates ticks for x and y axis.
-        
+
         You should call _updateXY before because that method computes the
         values of xscale, minxval, yscale, and other attributes needed for
         this method.
@@ -202,7 +202,7 @@ class Chart(object):
                     tick = Option(tick)
                 if tick.label is None:
                     label = str(tick.v)
-                else: 
+                else:
                     label = tick.label
                 pos = self.xscale * (tick.v - self.minxval)
                 if 0.0 <= pos <= 1.0:
@@ -224,11 +224,11 @@ class Chart(object):
         # evaluate yTicks
         self.yticks = []
         if self.options.axis.y.ticks:
-            for tick in self.options.y.ticks:
+            for tick in self.options.axis.y.ticks:
                 if not isinstance(tick, Option):
                     tick = Option(tick)
                 if tick.label is None:
-                    label = str(tick.v)  
+                    label = str(tick.v)
                 else:
                     label = tick.label
                 pos = self.yscale * (tick.v - self.minyval)
@@ -242,28 +242,28 @@ class Chart(object):
                 roughSeparation = 1
             else:
                 roughSeparation = round(num, prec)
-            
+
             for i in range(self.options.axis.y.tickCount + 1):
                 yval = self.minyval + (i * roughSeparation)
                 pos = 1.0 - ((yval - self.minyval) * self.yscale)
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, round(yval, prec)))
-            
+
     # render methods
     def _renderBackground(self, cx):
         """Renders the background area of the chart"""
         if self.options.background.hide:
             return
-        
+
         cx.save()
         cx.set_source_rgb(*hex2rgb(self.options.background.color))
         cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
         cx.fill()
         cx.set_source_rgb(*hex2rgb(self.options.background.lineColor))
         cx.set_line_width(self.options.axis.lineWidth)
-        
+
         self._renderLines(cx)
-        
+
         cx.restore()
 
     def _renderLines(self, cx):
@@ -271,9 +271,9 @@ class Chart(object):
         ticks = self.yticks
         for tick in ticks:
             self._renderLine(cx, tick, False)
-        
+
     def _renderLine(self, cx, tick, horiz):
-        """Aux function for _renderLines""" 
+        """Aux function for _renderLines"""
         x1, x2, y1, y2 = (0, 0, 0, 0)
         if horiz:
             x1 = x2 = tick[0] * self.area.w + self.area.x
@@ -297,26 +297,26 @@ class Chart(object):
         """Renders axis"""
         if self.options.axis.x.hide and self.options.axis.y.hide:
             return
-        
+
         cx.save()
         cx.set_source_rgb(*hex2rgb(self.options.axis.lineColor))
         cx.set_line_width(self.options.axis.lineWidth)
-        
+
         if not self.options.axis.y.hide:
             if self.yticks:
                 def drawYLabel(tick):
                     if callable(tick):
                         return
-                    
+
                     x = self.area.x
                     y = self.area.y + tick[0] * self.area.h
-                    
+
                     cx.new_path()
                     cx.move_to(x, y)
                     cx.line_to(x - self.options.axis.tickSize, y)
                     cx.close_path()
                     cx.stroke()
-                    
+
                     label =  unicode(tick[1])
                     extents = cx.text_extents(label)
                     labelWidth = extents[2]
@@ -324,11 +324,11 @@ class Chart(object):
                     cx.move_to(x - self.options.axis.tickSize - labelWidth - 5,
                                y + labelHeight / 2.0)
                     cx.show_text(label)
-                    
+
                     return label
                 for tick in self.yticks:
                     drawYLabel(tick)
-                
+
             cx.new_path()
             cx.move_to(self.area.x, self.area.y)
             cx.line_to(self.area.x, self.area.y + self.area.h)
@@ -340,16 +340,16 @@ class Chart(object):
                 def drawXLabel(tick):
                     if callable(tick):
                         return
-                    
+
                     x = self.area.x + tick[0] * self.area.w
                     y = self.area.y + self.area.h
-                    
+
                     cx.new_path()
                     cx.move_to(x, y)
                     cx.line_to(x, y + self.options.axis.tickSize)
                     cx.close_path()
                     cx.stroke()
-                    
+
                     label = unicode(tick[1])
                     extents = cx.text_extents(label)
                     labelWidth = extents[2]
@@ -360,7 +360,7 @@ class Chart(object):
                     return label
                 for tick in self.xticks:
                     drawXLabel(tick)
-            
+
             cx.new_path()
             cx.move_to(self.area.x, self.area.y + self.area.h)
             cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
@@ -373,7 +373,7 @@ class Chart(object):
         """This function adds a legend to the chart"""
         if self.options.legend.hide:
             return
-        
+
         padding = 4
         bullet = 15
         width = 0
@@ -394,7 +394,7 @@ class Chart(object):
         cx.set_line_width(self.options.stroke.width)
         cx.set_source_rgb(*hex2rgb(self.options.legend.borderColor))
         cx.stroke()
-        
+
         def drawKey(key, x, y, text_height):
             cx.rectangle(x, y, bullet, bullet)
             cx.set_source_rgb(*self.options.colorScheme[key])
@@ -404,7 +404,7 @@ class Chart(object):
             cx.move_to(x + bullet + padding,
                        y + bullet / 2.0 + text_height / 2.0)
             cx.show_text(key)
-        
+
         cx.set_line_width(1)
         x = self.options.legend.position.left + padding
         y = self.options.legend.position.top + padding
@@ -418,7 +418,7 @@ class Chart(object):
 def uniqueIndices(arr):
     """Return a list with the indexes of the biggest element of arr"""
     return range(max([len(a) for a in arr]))
-            
+
 class Area(object):
     """Simple rectangle to hold an area coordinates and dimensions"""
     def __init__(self, x, y, w, h):
