@@ -23,7 +23,7 @@ import pycha.line
 
 from lines import lines
 
-def barChart(output):
+def lineChart(output):
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 200)
 
     dataSet = (
@@ -60,4 +60,4 @@ def barChart(output):
 
 if __name__ == '__main__':
     output = sys.argv[1] if len(sys.argv) > 1 else 'linechart.png'
-    barChart(output)
+    lineChart(output)
