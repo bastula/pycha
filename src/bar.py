@@ -23,7 +23,33 @@ class BarChart(Chart):
     def __init__(self, surface=None, options={}):
         super(BarChart, self).__init__(surface, options)
         self.bars = []
-        self.minxdelta = 0
+        self.minxdelta = 0.0
+        self.barWidthForSet = 0.0
+        self.barMargin = 0.0
+
+    def _updateChart(self):
+        """Evaluates measures for vertical bars"""
+        stores = self._getDatasetsValues()
+        uniqx = uniqueIndices(stores)
+        xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
+
+        barWidth = 0
+        if len(uniqx) == 1:
+            xdelta = 1.0
+            self.xscale = 1.0
+            self.minxval = uniqx[0]
+            barWidth = 1.0 * self.options.barWidthFillFraction
+            self.barWidthForSet = barWidth / len(stores)
+            self.barMargin = (1.0 - self.options.barWidthFillFraction) / 2
+        else:
+            self.xscale = 1.0 / (self.xrange + 1)
+            barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
+            self.barWidthForSet = barWidth / len(stores)
+            self.barMargin = (xdelta * self.xscale
+                              * (1.0 - self.options.barWidthFillFraction) / 2)
+        
+        self.minxdelta = xdelta
+        self.bars = []
 
     def _renderChart(self, cx):
         """Renders a horizontal/vertical bar chart"""
@@ -64,44 +90,16 @@ class VerticalBarChart(BarChart):
 
     def _updateChart(self):
         """Evaluates measures for vertical bars"""
-        stores = self._getDatasetsValues()
-        uniqx = uniqueIndices(stores)
-        xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
-
-        barWidth = 0
-        barWidthForSet = 0
-        barMargin = 0
-        if len(uniqx) == 1:
-            xdelta = 1.0
-            self.xscale = 1.0
-            self.minxval = uniqx[0]
-            barWidth = 1.0 * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(stores)
-            barMargin = (1.0 - self.options.barWidthFillFraction) / 2
-        else:
-            if self.xrange == 1:
-                self.xscale = 0.5
-            elif self.xrange == 2:
-                self.xscale = 1 / 3.0
-            else:
-                self.xscale = (1.0 - 1 / self.xrange) / self.xrange
-
-            barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(stores)
-            barMargin = (xdelta * self.xscale
-                         * (1.0 - self.options.barWidthFillFraction)/2)
-        
-        self.minxdelta = xdelta
-        self.bars = []
+        super(VerticalBarChart, self)._updateChart()
 
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
                 x = (((xval - self.minxval) * self.xscale)
-                    + (i * barWidthForSet) + barMargin)
-                y = 1.0 - (yval - self.minyval) * self.yscale
-                w = barWidthForSet
+                    + (i * self.barWidthForSet) + self.barMargin)
+                w = self.barWidthForSet
                 h = (yval - self.minyval) * self.yscale
+                y = 1.0 - h
                 rect = Rect(x, y, w, h, xval, yval, name)
                 
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
@@ -121,39 +119,19 @@ class HorizontalBarChart(BarChart):
 
     def _updateChart(self):
         """Evaluates measures for horizontal bars"""
-        stores = self._getDatasetsValues()
-        uniqx = uniqueIndices(stores)
-        xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
-        barWidth = 0
-        barWidthForSet = 0
-        barMargin = 0
-        if len(uniqx) == 1:
-            xdelta = 1.0
-            self.xscale = 1.0
-            self.minxval = uniqx[0]
-            barWidth = 1.0 * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(stores)
-            barMargin = (1.0 - self.options.barWidthFillFraction) / 2
-        else:
-            self.xscale = (1.0 - xdelta / self.xrange) / self.xrange
-            barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
-            barWidthForSet = barWidth / len(stores)
-            barMargin = xdelta * self.xscale * (1.0 - self.options.barWidthFillFraction) / 2
-        
-        self.minxdelta = xdelta
-        self.bars = []
+        super(HorizontalBarChart, self)._updateChart()
 
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
-                y = ((xval - self.minxval) * self.xscale) + (i * barWidthForSet) + barMargin
+                y = (((xval - self.minxval) * self.xscale)
+                     + (i * self.barWidthForSet) + self.barMargin)
                 x = 0.0
-                h = barWidthForSet
+                h = self.barWidthForSet
                 w = (yval - self.minyval) * self.yscale
-                y = clamp(0.0, 1.0, y)
                 rect = Rect(x, y, w, h, xval, yval, name)
                 
-                if (0.0 <= rect.x <= 1.0):
+                if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
     def _updateTicks(self):
