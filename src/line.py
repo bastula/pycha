@@ -33,9 +33,9 @@ class LineChart(Chart):
                 xval, yval = item
                 x = (xval - self.minxval) * self.xscale
                 y = 1.0 - (yval - self.minyval) * self.yscale
-                point = Point(x, clamp(0.0, 1.0, y), xval, yval, name)
+                point = Point(x, y, xval, yval, name)
                 
-                if 0.0 <= point.x <= 1.0:
+                if 0.0 <= point.x <= 1.0 and 0.0 <= point.y <= 1.0:
                     self.points.append(point)
     
     def _renderChart(self, cx):

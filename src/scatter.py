@@ -17,28 +17,10 @@
 
 from pycha.chart import Chart
 from pycha.color import hex2rgb, clamp
-from pycha.line import Point
+from pycha.line import Point, LineChart
 
-class ScatterplotChart(Chart):
-    
-    def __init__(self, surface=None, options={}):
-        super(ScatterplotChart, self).__init__(surface, options)
-        self.points = []
-        
-    def _updateChart(self):
-        """Evaluates measures for scatterplots"""
-        self.points = []
-
-        for i, (name, store) in enumerate(self.datasets):
-            for item in store:
-                xval, yval = item
-                x = (xval - self.minxval) * self.xscale
-                y = 1.0 - (yval - self.minyval) * self.yscale
-                point = Point(x, clamp(0.0, 1.0, y), xval, yval, name)
-                
-                if 0.0 <= point.x <= 1.0:
-                    self.points.append(point)
-    
+class ScatterplotChart(LineChart):
+      
     def _renderChart(self, cx):
         """Renders a scatterplot"""
 	def drawSymbol(point, size=2):
