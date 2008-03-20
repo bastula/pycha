@@ -42,15 +42,31 @@ class LineChart(Chart):
         """Renders a line chart"""        
         def preparePath(storeName):
             cx.new_path()
-            cx.move_to(self.area.x, self.area.y + self.area.h)
+            firstPoint = True
+            lastX = None
+            if self.options.shouldFill:
+                # Go to the (0,0) coordinate to start drawing the area
+                cx.move_to(self.area.x, self.area.y + self.area.h)
+
             for point in self.points:
                 if point.name == storeName:
+                    if not self.options.shouldFill and firstPoint:
+                        # starts the first point of the line
+                        cx.move_to(point.x * self.area.w + self.area.x,
+                                   point.y * self.area.h + self.area.y)
+                        firstPoint = False
+                        continue
                     cx.line_to(point.x * self.area.w + self.area.x,
                                point.y * self.area.h + self.area.y)
-            cx.line_to(self.area.w + self.area.x, self.area.h + self.area.y)
-            cx.line_to(self.area.x, self.area.y + self.area.h)
+                    # we remember the last X coordinate to close the area
+                    # properly. See bug #4
+                    lastX = point.x
 
             if self.options.shouldFill:
+                # Close the path to the start point
+                cx.line_to(lastX * self.area.w + self.area.x,
+                           self.area.h + self.area.y)
+                cx.line_to(self.area.x, self.area.y + self.area.h)
                 cx.close_path()
             else:
                 cx.set_source_rgb(*self.options.colorScheme[storeName])
