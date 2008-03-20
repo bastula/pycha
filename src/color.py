@@ -48,16 +48,17 @@ def lighten(r, g, b, amount):
             clamp(0.0, 1.0, g + amount),
             clamp(0.0, 1.0, b + amount))
     
-def generateColorscheme(masterColor, keys, light=0.098):
+def generateColorscheme(masterColor, keys):
     """Generates a dictionary where the keys match the keys argument and
     the values are colors derivated from the masterColor.
 
-    Each color is a lighter version of masterColor separated by a difference
-    given by the light argument.
+    Each color is a lighter version of masterColor. This difference is
+    computed based on the number of keys.
 
     The masterColor is given in a hex string format.
     """
     r, g, b = hex2rgb(masterColor)
+    light = 1.0 / (len(keys)*2)
     return dict([(key, lighten(r, g, b, light * i))
                  for i, key in enumerate(keys)])
 
