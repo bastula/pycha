@@ -31,7 +31,6 @@ class BarChart(Chart):
         """Evaluates measures for vertical bars"""
         stores = self._getDatasetsValues()
         uniqx = uniqueIndices(stores)
-        xdelta = min([abs(uniqx[j] - uniqx[j-1]) for j in range(1, len(uniqx))])
 
         barWidth = 0
         if len(uniqx) == 1:
@@ -42,6 +41,8 @@ class BarChart(Chart):
             self.barWidthForSet = barWidth / len(stores)
             self.barMargin = (1.0 - self.options.barWidthFillFraction) / 2
         else:
+            xdelta = min([abs(uniqx[j] - uniqx[j-1])
+                          for j in range(1, len(uniqx))])
             self.xscale = 1.0 / (self.xrange + 1)
             barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
             self.barWidthForSet = barWidth / len(stores)

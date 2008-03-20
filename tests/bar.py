@@ -40,6 +40,22 @@ class BarTests(unittest.TestCase):
         self.assertEqual(ch.bars, [])
         self.assertEqual(ch.minxdelta, 0)
 
+    def test_updateChart(self):
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+        # An evil dataset with just one point. See bug #9
+        dataset = (
+            ('dataset1', ([0, 0],)),
+        )
+        ch = pycha.bar.BarChart(surface)
+        ch.addDataset(dataset)
+        ch._updateXY()
+        ch._updateChart()
+
+        self.assertEqual(ch.xscale, 1.0)
+        self.assertEqual(ch.minxval, 0)
+        self.assertAlmostEqual(ch.barWidthForSet, 0.75, 4)
+        self.assertAlmostEqual(ch.barMargin, 0.125, 4)
+
 class VerticalBarTests(unittest.TestCase):
 
     def test_updateChart(self):
