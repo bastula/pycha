@@ -307,7 +307,7 @@ class Chart(object):
     def _renderChart(self, cx):
         raise NotImplementedError
 
-    def _renderYLabel(self, cx, tick):
+    def _renderYTick(self, cx, tick):
         """Aux method for _renderAxis"""
 
         if callable(tick):
@@ -344,7 +344,7 @@ class Chart(object):
 
         return label
 
-    def _renderXLabel(self, cx, tick, fontAscent):
+    def _renderXTick(self, cx, tick, fontAscent):
         if callable(tick):
             return
 
@@ -423,7 +423,7 @@ class Chart(object):
         if not self.options.axis.y.hide:
             if self.yticks:
                 for tick in self.yticks:
-                    self._renderYLabel(cx, tick)
+                    self._renderYTick(cx, tick)
 
             if self.options.axis.y.label:
                 cx.save()
@@ -446,7 +446,7 @@ class Chart(object):
             fontAscent = cx.font_extents()[0]
             if self.xticks:
                 for tick in self.xticks:
-                    self._renderXLabel(cx, tick, fontAscent)
+                    self._renderXTick(cx, tick, fontAscent)
 
             if self.options.axis.x.label:
                 cx.save()
