@@ -188,6 +188,22 @@ class ChartTests(unittest.TestCase):
             self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
             self.assertAlmostEqual(ch.yticks[i][1], yticks[i][1], 4)
 
+    def test_updateExplicitTicks(self):
+        """Test for bug #7"""
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+        yticks = [dict(v=i, label=str(i)) for i in range(0, 3)]
+        opt = {'axis': {'y': {'ticks': yticks}}}
+        dataset = (
+            ('dataset1', ([0, 1], [1, 1], [2, 3])),
+            )
+        ch = pycha.chart.Chart(surface, opt)
+        ch.addDataset(dataset)
+        ch._updateXY()
+        ch._updateTicks()
+        self.assertAlmostEqual(ch.yticks[0][0], 1.0, 4)
+        self.assertAlmostEqual(ch.yticks[1][0], 2/3.0, 4)
+        self.assertAlmostEqual(ch.yticks[2][0], 1/3.0, 4)
+        
     def test_abstractChart(self):
         ch = pycha.chart.Chart(None)
         self.assertRaises(NotImplementedError, ch._updateChart)

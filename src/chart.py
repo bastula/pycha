@@ -231,7 +231,7 @@ class Chart(object):
                     label = str(tick.v)
                 else:
                     label = tick.label
-                pos = self.yscale * (tick.v - self.minyval)
+                pos = 1.0 - (self.yscale * (tick.v - self.minyval))
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, label))
 
