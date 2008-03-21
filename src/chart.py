@@ -92,6 +92,7 @@ class Chart(object):
         self._renderBackground(cx)
         self._renderChart(cx)
         self._renderAxis(cx)
+        self._renderTitle(cx)
         self._renderLegend(cx)
 
     def clean(self):
@@ -369,6 +370,31 @@ class Chart(object):
 
         cx.restore()
 
+    def _renderTitle(self, cx):
+        if self.options.title:
+            # get previous font information
+            oldFace = cx.get_font_face()
+            oldMatrix = cx.get_font_matrix()
+            
+            cx.select_font_face(self.options.titleFont,
+                                cairo.FONT_SLANT_NORMAL,
+                                cairo.FONT_WEIGHT_BOLD)
+            cx.set_font_size(self.options.titleFontSize) 
+
+            title = unicode(self.options.title)
+            extents = cx.text_extents(title)
+            titleWidth = extents[2] 
+
+            x = self.area.x + self.area.w / 2.0 - titleWidth / 2.0 
+            y = cx.font_extents()[0] # font ascent 
+
+            cx.move_to(x, y)
+            cx.show_text(title)
+            
+            # restore font state
+            cx.set_font_face(oldFace)
+            cx.set_font_matrix(oldMatrix)
+
     def _renderLegend(self, cx):
         """This function adds a legend to the chart"""
         if self.options.legend.hide:
@@ -497,4 +523,7 @@ DEFAULT_OPTIONS = Option(
     yOriginIsZero=True,
     pieRadius=0.4,
     colorScheme=DEFAULT_COLOR,
+    title=None,
+    titleFont='Tahoma',
+    titleFontSize=12,
 )
