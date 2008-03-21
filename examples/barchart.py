@@ -34,9 +34,13 @@ def barChart(output, chartFactory):
         'axis': {
             'x': {
                 'ticks': [dict(v=i, label=l[0]) for i, l in enumerate(lines)],
+                'label': 'Files',
+                'rotate': 25,
             },
             'y': {
                 'tickCount': 4,
+                'rotate': 25,
+                'label': 'Lines'
             }
         },
         'background': {
@@ -49,7 +53,8 @@ def barChart(output, chartFactory):
             'hide': True,
         },
         'padding': {
-            'left': 55
+            'left': 55,
+            'bottom': 55,
         },
         'title': 'Sample Chart'
     }

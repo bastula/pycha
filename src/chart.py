@@ -16,6 +16,8 @@
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
+import math
+
 import cairo
 
 from pycha.color import (defaultColorscheme, getColorscheme, hex2rgb,
@@ -305,6 +307,110 @@ class Chart(object):
     def _renderChart(self, cx):
         raise NotImplementedError
 
+    def _renderYLabel(self, cx, tick):
+        """Aux method for _renderAxis"""
+
+        if callable(tick):
+            return
+
+        x = self.area.x
+        y = self.area.y + tick[0] * self.area.h
+
+        cx.new_path()
+        cx.move_to(x, y)
+        cx.line_to(x - self.options.axis.tickSize, y)
+        cx.close_path()
+        cx.stroke()
+
+        label =  unicode(tick[1])
+        extents = cx.text_extents(label)
+        labelWidth = extents[2]
+        labelHeight = extents[3]
+
+        if self.options.axis.y.rotate:
+            radians = math.radians(self.options.axis.y.rotate)
+            cx.move_to(x - self.options.axis.tickSize
+                       - (labelWidth * math.cos(radians))
+                       - 4,
+                       y + (labelWidth * math.sin(radians))
+                       + labelHeight / (2.0 / math.cos(radians)))
+            cx.rotate(-radians)
+            cx.show_text(label)
+            cx.rotate(radians) # this is probably faster than a save/restore
+        else:
+            cx.move_to(x - self.options.axis.tickSize - labelWidth - 4,
+                       y + labelHeight / 2.0)
+            cx.show_text(label)
+
+        return label
+
+    def _renderXLabel(self, cx, tick, fontAscent):
+        if callable(tick):
+            return
+
+        x = self.area.x + tick[0] * self.area.w
+        y = self.area.y + self.area.h
+
+        cx.new_path()
+        cx.move_to(x, y)
+        cx.line_to(x, y + self.options.axis.tickSize)
+        cx.close_path()
+        cx.stroke()
+
+        label = unicode(tick[1])
+        extents = cx.text_extents(label)
+        labelWidth = extents[2]
+        labelHeight = extents[3]
+
+        if self.options.axis.x.rotate:
+            radians = math.radians(self.options.axis.x.rotate)
+            cx.move_to(x - (labelHeight * math.cos(radians)),
+                       y + self.options.axis.tickSize
+                       + (labelHeight * math.cos(radians))
+                       + 4.0)
+            cx.rotate(radians)
+            cx.show_text(label)
+            cx.rotate(-radians)
+        else:
+            cx.move_to(x - labelWidth / 2.0,
+                       y + self.options.axis.tickSize
+                       + fontAscent + 4.0)
+            cx.show_text(label)
+        return label
+
+    def _getTickSize(self, cx, ticks, rotate):
+        tickExtents = [cx.text_extents(unicode(tick[1]))[2:4] for tick in ticks]
+        tickWidth = tickHeight = 0.0
+        if tickExtents:
+            tickHeight = tickHeight = self.options.axis.tickSize + 4.0
+            widths, heights = zip(*tickExtents)
+            maxWidth, maxHeight = max(widths), max(heights)
+            if rotate:
+                radians = math.radians(rotate)
+                sinRadians = math.sin(radians)
+                cosRadians = math.cos(radians)
+                maxHeight = maxWidth * sinRadians + maxHeight * cosRadians
+                maxWidth =  maxWidth * cosRadians + maxHeight * sinRadians
+            tickWidth += maxWidth
+            tickHeight += maxHeight
+        return tickWidth, tickHeight
+        
+    def _renderAxisLabel(self, cx, tickWidth, tickHeight, label, x, y, vertical=False):
+        cx.new_path()
+        cx.select_font_face(self.options.axis.labelFont,
+                            cairo.FONT_SLANT_NORMAL,
+                            cairo.FONT_WEIGHT_BOLD)
+        labelWidth = cx.text_extents(label)[2]
+        fontAscent = cx.font_extents()[0]
+        if vertical:
+            cx.move_to(x, y + labelWidth / 2)
+            radians = math.radians(90)
+            cx.rotate(-radians)
+        else:
+            cx.move_to(x - labelWidth / 2.0, y + fontAscent)
+            
+        cx.show_text(label)
+
     def _renderAxis(self, cx):
         """Renders axis"""
         if self.options.axis.x.hide and self.options.axis.y.hide:
@@ -316,31 +422,20 @@ class Chart(object):
 
         if not self.options.axis.y.hide:
             if self.yticks:
-                def drawYLabel(tick):
-                    if callable(tick):
-                        return
-
-                    x = self.area.x
-                    y = self.area.y + tick[0] * self.area.h
-
-                    cx.new_path()
-                    cx.move_to(x, y)
-                    cx.line_to(x - self.options.axis.tickSize, y)
-                    cx.close_path()
-                    cx.stroke()
-
-                    label =  unicode(tick[1])
-                    extents = cx.text_extents(label)
-                    labelWidth = extents[2]
-                    labelHeight = extents[3]
-                    cx.move_to(x - self.options.axis.tickSize - labelWidth - 5,
-                               y + labelHeight / 2.0)
-                    cx.show_text(label)
-
-                    return label
                 for tick in self.yticks:
-                    drawYLabel(tick)
+                    self._renderYLabel(cx, tick)
 
+            if self.options.axis.y.label:
+                cx.save()
+                rotate = self.options.axis.y.rotate
+                tickWidth, tickHeight = self._getTickSize(cx, self.yticks, rotate)
+                label = unicode(self.options.axis.y.label)
+                x = self.area.x - tickWidth - 4.0
+                y = self.area.y + 0.5 * self.area.h
+                self._renderAxisLabel(cx, tickWidth, tickHeight, label, x, y, True)
+                cx.restore()
+
+            # draws the vertical line representing the Y axis
             cx.new_path()
             cx.move_to(self.area.x, self.area.y)
             cx.line_to(self.area.x, self.area.y + self.area.h)
@@ -348,31 +443,22 @@ class Chart(object):
             cx.stroke()
 
         if not self.options.axis.x.hide:
+            fontAscent = cx.font_extents()[0]
             if self.xticks:
-                def drawXLabel(tick):
-                    if callable(tick):
-                        return
-
-                    x = self.area.x + tick[0] * self.area.w
-                    y = self.area.y + self.area.h
-
-                    cx.new_path()
-                    cx.move_to(x, y)
-                    cx.line_to(x, y + self.options.axis.tickSize)
-                    cx.close_path()
-                    cx.stroke()
-
-                    label = unicode(tick[1])
-                    extents = cx.text_extents(label)
-                    labelWidth = extents[2]
-                    labelHeight = extents[3]
-                    cx.move_to(x - labelWidth / 2.0,
-                               y + self.options.axis.tickSize + 10)
-                    cx.show_text(label)
-                    return label
                 for tick in self.xticks:
-                    drawXLabel(tick)
+                    self._renderXLabel(cx, tick, fontAscent)
 
+            if self.options.axis.x.label:
+                cx.save()
+                rotate = self.options.axis.x.rotate
+                tickWidth, tickHeight = self._getTickSize(cx, self.xticks, rotate)
+                label = unicode(self.options.axis.x.label)
+                x = self.area.x + self.area.w / 2.0
+                y = self.area.y + self.area.h + tickHeight + 4.0
+                self._renderAxisLabel(cx, tickWidth, tickHeight, label, x, y, False)
+                cx.restore()
+
+            # draws the horizontal line representing the X axis
             cx.new_path()
             cx.move_to(self.area.x, self.area.y + self.area.h)
             cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
@@ -383,10 +469,7 @@ class Chart(object):
 
     def _renderTitle(self, cx):
         if self.options.title:
-            # get previous font information
-            oldFace = cx.get_font_face()
-            oldMatrix = cx.get_font_matrix()
-            
+            cx.save()           
             cx.select_font_face(self.options.titleFont,
                                 cairo.FONT_SLANT_NORMAL,
                                 cairo.FONT_WEIGHT_BOLD)
@@ -402,9 +485,7 @@ class Chart(object):
             cx.move_to(x, y)
             cx.show_text(title)
             
-            # restore font state
-            cx.set_font_face(oldFace)
-            cx.set_font_matrix(oldMatrix)
+            cx.restore()
 
     def _renderLegend(self, cx):
         """This function adds a legend to the chart"""
@@ -493,6 +574,8 @@ DEFAULT_OPTIONS = Option(
             tickCount=10,
             tickPrecision=1,
             range=None,
+            rotate=None,
+            label=None,
         ),
         y=Option(
             hide=False,
@@ -500,6 +583,8 @@ DEFAULT_OPTIONS = Option(
             tickCount=10,
             tickPrecision=1,
             range=None,
+            rotate=None,
+            label=None,
         ),
     ),
     background=Option(
