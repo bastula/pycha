@@ -52,10 +52,10 @@ def testBar():
 
     dataSet = (
         ('myFirstDataset', [[0, 1], [1, 1], [2, 1.414], [3, 1.73]]),
-	('mySecondDataset', [[0, 0.3], [1, 2.67], [2, 1.34], [3, 1.73]]),
-	('myThirdDataset', [[0, 0.46], [1, 1.45], [2, 2.5], [3, 1.2]]),
-	('myFourthDataset', [[0, 0.86], [1, 0.83], [2, 3], [3, 1.73]]),
-        )
+        ('mySecondDataset', [[0, 0.3], [1, 2.67], [2, 1.34], [3, 1.73]]),
+        ('myThirdDataset', [[0, 0.46], [1, 1.45], [2, 2.5], [3, 1.2]]),
+        ('myFourthDataset', [[0, 0.86], [1, 0.83], [2, 3], [3, 1.73]]),
+    )
 
     chart.addDataset(dataSet)
     chart.render()
@@ -69,10 +69,10 @@ def testLine():
 
     dataSet = (
         ('myFirstDataset', [[0, 3], [1, 2], [2, 1.414], [3, 2.3]]),
-	('mySecondDataset', [[0, 1.4], [1, 2.67], [2, 1.34], [3, 1.2]]),
-	('myThirdDataset', [[0, 0.46], [1, 1.45], [2, 1.0], [3, 1.6]]),
-	('myFourthDataset', [[0, 0.3], [1, 0.83], [2, 0.7], [3, 0.2]]),
-        )
+        ('mySecondDataset', [[0, 1.4], [1, 2.67], [2, 1.34], [3, 1.2]]),
+        ('myThirdDataset', [[0, 0.46], [1, 1.45], [2, 1.0], [3, 1.6]]),
+        ('myFourthDataset', [[0, 0.3], [1, 0.83], [2, 0.7], [3, 0.2]]),
+    )
 
     chart.addDataset(dataSet)
     chart.render()

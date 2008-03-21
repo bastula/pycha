@@ -48,7 +48,8 @@ def lineChart(output):
             'hide': True,
         },
         'padding': {
-            'left': 55
+            'left': 55,
+            'bottom': 40,
         }
     }
     chart = pycha.line.LineChart(surface, options)

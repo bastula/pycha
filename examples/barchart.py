@@ -53,7 +53,7 @@ def barChart(output, chartFactory):
             'hide': True,
         },
         'padding': {
-            'left': 55,
+            'left': 75,
             'bottom': 55,
         },
         'title': 'Sample Chart'
