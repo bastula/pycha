@@ -257,13 +257,24 @@ class Chart(object):
             return
 
         cx.save()
-        cx.set_source_rgb(*hex2rgb(self.options.background.color))
-        cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
-        cx.fill()
-        cx.set_source_rgb(*hex2rgb(self.options.background.lineColor))
-        cx.set_line_width(self.options.axis.lineWidth)
 
-        self._renderLines(cx)
+        if self.options.background.baseColor:
+            cx.set_source_rgb(*hex2rgb(self.options.background.baseColor))
+            x, y, w, h = 0, 0, self.area.w, self.area.h
+            w += self.options.padding.left + self.options.padding.right
+            h += self.options.padding.top + self.options.padding.bottom
+            cx.rectangle(x, y, w, h)
+            cx.fill() 
+
+        if self.options.background.chartColor:
+            cx.set_source_rgb(*hex2rgb(self.options.background.chartColor))
+            cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
+            cx.fill() 
+
+        if self.options.background.lineColor:
+            cx.set_source_rgb(*hex2rgb(self.options.background.lineColor))
+            cx.set_line_width(self.options.axis.lineWidth)
+            self._renderLines(cx) 
 
         cx.restore()
 
@@ -492,8 +503,9 @@ DEFAULT_OPTIONS = Option(
         ),
     ),
     background=Option(
-        color='#f5f5f5',
         hide=False,
+        baseColor=None,
+        chartColor='#f5f5f5',
         lineColor='#ffffff',
         lineWidth=1.5,
     ),

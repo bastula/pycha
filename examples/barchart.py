@@ -40,7 +40,8 @@ def barChart(output, chartFactory):
             }
         },
         'background': {
-            'color': '#eeeeff',
+            'chartColor': '#ffeeff',
+            'baseColor': '#ffffff',
             'lineColor': '#444444'
         },
         'colorScheme': 'red',
@@ -49,7 +50,8 @@ def barChart(output, chartFactory):
         },
         'padding': {
             'left': 55
-        }
+        },
+        'title': 'Sample Chart'
     }
     chart = chartFactory(surface, options)
 

@@ -79,9 +79,15 @@ class PieChart(Chart):
             return
         
         cx.save()
-        cx.set_source_rgb(*hex2rgb(self.options.background.color))
-        cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
-        cx.fill()
+
+        if self.options.background.baseColor:
+            cx.set_source_rgb(*hex2rgb(self.options.background.baseColor))
+            x, y, w, h = 0, 0, self.area.w, self.area.h
+            w += self.options.padding.left + self.options.padding.right
+            h += self.options.padding.top + self.options.padding.bottom
+            cx.rectangle(x, y, w, h)
+            cx.fill()
+        
         cx.restore()
 
     def _renderChart(self, cx):
