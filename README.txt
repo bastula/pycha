@@ -111,6 +111,7 @@ legend and use a different color for the background::
 
 Now we are ready to instantiate the chart, add the data set and render it::
 
+   import pycha.bar
    chart = pycha.bar.VerticalBarChart(surface, options)
    chart.addDataset(dataSet)
    chart.render()
