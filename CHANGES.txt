@@ -1,9 +1,14 @@
 Changes
 =======
 
-0.2.1 (unreleased)
+0.3.0 (2008-03-22)
 ------------------
-- ...
+- Scattered charts
+- Chart titles
+- Axis labels and rotated ticks
+- Chart background and surface background
+- Automatically augment the light in large color schemes
+- Lots of bug fixes
 
 0.2.0 (2007-10-25)
 ------------------
