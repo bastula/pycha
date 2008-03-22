@@ -7,12 +7,12 @@ Changes
 
 0.3.0 (2008-03-22)
 ------------------
-- Scattered charts
-- Chart titles
-- Axis labels and rotated ticks
-- Chart background and surface background
-- Automatically augment the light in large color schemes
-- Lots of bug fixes
+- Scattered charts (Tamas Nepusz <ntamas_AT_rmki.kfki.hu>)
+- Chart titles (John Eikenberry <jae_AT_zhar.net>)
+- Axis labels and rotated ticks (John)
+- Chart background and surface background (John)
+- Automatically augment the light in large color schemes (John)
+- Lots of bug fixes (John and Lorenzo)
 
 0.2.0 (2007-10-25)
 ------------------
