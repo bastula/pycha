@@ -3,7 +3,7 @@ Changes
 
 0.3.1 (unreleased)
 ------------------
-- ...
+- Do not overlap Y axis label when ticks label are not rotated (John Eikenberry)
 
 0.3.0 (2008-03-22)
 ------------------

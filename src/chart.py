@@ -382,7 +382,8 @@ class Chart(object):
         tickExtents = [cx.text_extents(unicode(tick[1]))[2:4] for tick in ticks]
         tickWidth = tickHeight = 0.0
         if tickExtents:
-            tickHeight = tickHeight = self.options.axis.tickSize + 4.0
+            tickHeight = self.options.axis.tickSize + 4.0
+            tickWidth = self.options.axis.tickSize + 4.0
             widths, heights = zip(*tickExtents)
             maxWidth, maxHeight = max(widths), max(heights)
             if rotate:
@@ -394,7 +395,7 @@ class Chart(object):
             tickWidth += maxWidth
             tickHeight += maxHeight
         return tickWidth, tickHeight
-        
+
     def _renderAxisLabel(self, cx, tickWidth, tickHeight, label, x, y, vertical=False):
         cx.new_path()
         cx.select_font_face(self.options.axis.labelFont,
