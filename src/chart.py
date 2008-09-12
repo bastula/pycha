@@ -543,6 +543,10 @@ class Area(object):
     def __init__(self, x, y, w, h):
         self.x, self.y, self.w, self.h = x, y, w, h
 
+    def __str__(self):
+        return "<pycha.chart.Area@(%.2f, %.2f) %.2fx%.2f" % (self.x, self.y,
+                                                             self.w, self.h)
+
 class Option(dict):
     """Useful dict that allow attribute-like access to its keys"""
     def __getattr__(self, name):
