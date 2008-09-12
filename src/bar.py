@@ -158,3 +158,7 @@ class Rect(object):
         self.x, self.y, self.w, self.h = x, y, w, h
         self.xval, self.yval = xval, yval
         self.name = name
+
+    def __str__(self):
+        return "<pycha.bar.Rect@(%.2f, %.2f) %.2fx%.2f>" % (self.x, self.y,
+                                                            self.w, self.h)

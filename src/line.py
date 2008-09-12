@@ -111,3 +111,6 @@ class Point(object):
         self.x, self.y = x, y
         self.xval, self.yval = xval, yval
         self.name = name
+
+    def __str__(self):
+        return "<pycha.line.Point@(%.2f, %.2f)>" % (self.x, self.y)
