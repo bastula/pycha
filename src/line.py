@@ -19,11 +19,11 @@ from pycha.chart import Chart
 from pycha.color import hex2rgb, clamp
 
 class LineChart(Chart):
-    
+
     def __init__(self, surface=None, options={}):
         super(LineChart, self).__init__(surface, options)
         self.points = []
-        
+
     def _updateChart(self):
         """Evaluates measures for line charts"""
         self.points = []
@@ -34,12 +34,12 @@ class LineChart(Chart):
                 x = (xval - self.minxval) * self.xscale
                 y = 1.0 - (yval - self.minyval) * self.yscale
                 point = Point(x, y, xval, yval, name)
-                
+
                 if 0.0 <= point.x <= 1.0 and 0.0 <= point.y <= 1.0:
                     self.points.append(point)
-    
+
     def _renderChart(self, cx):
-        """Renders a line chart"""        
+        """Renders a line chart"""
         def preparePath(storeName):
             cx.new_path()
             firstPoint = True
@@ -71,7 +71,7 @@ class LineChart(Chart):
             else:
                 cx.set_source_rgb(*self.options.colorScheme[storeName])
                 cx.stroke()
-        
+
 
         cx.save()
         cx.set_line_width(self.options.stroke.width)
@@ -85,12 +85,12 @@ class LineChart(Chart):
                     preparePath(storeName)
                     cx.fill()
                     cx.restore()
-                
+
                 # fill the line
                 cx.set_source_rgb(*self.options.colorScheme[storeName])
                 preparePath(storeName)
                 cx.fill()
-                
+
                 if not self.options.stroke.hide:
                     # draw stroke
                     cx.set_source_rgb(*hex2rgb(self.options.stroke.color))

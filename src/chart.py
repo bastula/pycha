@@ -266,17 +266,17 @@ class Chart(object):
             w += self.options.padding.left + self.options.padding.right
             h += self.options.padding.top + self.options.padding.bottom
             cx.rectangle(x, y, w, h)
-            cx.fill() 
+            cx.fill()
 
         if self.options.background.chartColor:
             cx.set_source_rgb(*hex2rgb(self.options.background.chartColor))
             cx.rectangle(self.area.x, self.area.y, self.area.w, self.area.h)
-            cx.fill() 
+            cx.fill()
 
         if self.options.background.lineColor:
             cx.set_source_rgb(*hex2rgb(self.options.background.lineColor))
             cx.set_line_width(self.options.axis.lineWidth)
-            self._renderLines(cx) 
+            self._renderLines(cx)
 
         cx.restore()
 
@@ -409,7 +409,7 @@ class Chart(object):
             cx.rotate(-radians)
         else:
             cx.move_to(x - labelWidth / 2.0, y + fontAscent)
-            
+
         cx.show_text(label)
 
     def _renderAxis(self, cx):
@@ -470,22 +470,22 @@ class Chart(object):
 
     def _renderTitle(self, cx):
         if self.options.title:
-            cx.save()           
+            cx.save()
             cx.select_font_face(self.options.titleFont,
                                 cairo.FONT_SLANT_NORMAL,
                                 cairo.FONT_WEIGHT_BOLD)
-            cx.set_font_size(self.options.titleFontSize) 
+            cx.set_font_size(self.options.titleFontSize)
 
             title = unicode(self.options.title)
             extents = cx.text_extents(title)
-            titleWidth = extents[2] 
+            titleWidth = extents[2]
 
-            x = self.area.x + self.area.w / 2.0 - titleWidth / 2.0 
-            y = cx.font_extents()[0] # font ascent 
+            x = self.area.x + self.area.w / 2.0 - titleWidth / 2.0
+            y = cx.font_extents()[0] # font ascent
 
             cx.move_to(x, y)
             cx.show_text(title)
-            
+
             cx.restore()
 
     def _renderLegend(self, cx):

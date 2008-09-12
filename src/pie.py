@@ -77,7 +77,7 @@ class PieChart(Chart):
         """Renders the background of the chart"""
         if self.options.background.hide:
             return
-        
+
         cx.save()
 
         if self.options.background.baseColor:
@@ -87,7 +87,7 @@ class PieChart(Chart):
             h += self.options.padding.top + self.options.padding.bottom
             cx.rectangle(x, y, w, h)
             cx.fill()
-        
+
         cx.restore()
 
     def _renderChart(self, cx):
@@ -186,7 +186,7 @@ class Slice(object):
                self.endAngle - math.pi/2)
         cx.line_to(centerx, centery)
         cx.close_path()
-    
+
     def getNormalisedAngle(self):
         normalisedAngle = (self.startAngle + self.endAngle) / 2
 

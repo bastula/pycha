@@ -24,7 +24,7 @@ def clamp(minValue, maxValue, value):
     if value > maxValue:
         return maxValue
     return value
-    
+
 def hex2rgb(hexstring, digits=2):
     """Converts a hexstring color to a rgb tuple.
 
@@ -47,7 +47,7 @@ def lighten(r, g, b, amount):
     return (clamp(0.0, 1.0, r + amount),
             clamp(0.0, 1.0, g + amount),
             clamp(0.0, 1.0, b + amount))
-    
+
 def generateColorscheme(masterColor, keys):
     """Generates a dictionary where the keys match the keys argument and
     the values are colors derivated from the masterColor.
