@@ -412,6 +412,22 @@ class Chart(object):
 
         cx.show_text(label)
 
+    def _renderYAxis(self, cx):
+        """Draws the vertical line represeting the Y axis"""
+        cx.new_path()
+        cx.move_to(self.area.x, self.area.y)
+        cx.line_to(self.area.x, self.area.y + self.area.h)
+        cx.close_path()
+        cx.stroke()
+
+    def _renderXAxis(self, cx):
+        """Draws the horizontal line representing the X axis"""
+        cx.new_path()
+        cx.move_to(self.area.x, self.area.y + self.area.h)
+        cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
+        cx.close_path()
+        cx.stroke()
+
     def _renderAxis(self, cx):
         """Renders axis"""
         if self.options.axis.x.hide and self.options.axis.y.hide:
@@ -429,19 +445,16 @@ class Chart(object):
             if self.options.axis.y.label:
                 cx.save()
                 rotate = self.options.axis.y.rotate
-                tickWidth, tickHeight = self._getTickSize(cx, self.yticks, rotate)
+                tickWidth, tickHeight = self._getTickSize(cx, self.yticks,
+                                                          rotate)
                 label = unicode(self.options.axis.y.label)
                 x = self.area.x - tickWidth - 4.0
                 y = self.area.y + 0.5 * self.area.h
-                self._renderAxisLabel(cx, tickWidth, tickHeight, label, x, y, True)
+                self._renderAxisLabel(cx, tickWidth, tickHeight, label, x, y,
+                                      True)
                 cx.restore()
 
-            # draws the vertical line representing the Y axis
-            cx.new_path()
-            cx.move_to(self.area.x, self.area.y)
-            cx.line_to(self.area.x, self.area.y + self.area.h)
-            cx.close_path()
-            cx.stroke()
+            self._renderYAxis(cx)
 
         if not self.options.axis.x.hide:
             fontAscent = cx.font_extents()[0]
@@ -452,19 +465,16 @@ class Chart(object):
             if self.options.axis.x.label:
                 cx.save()
                 rotate = self.options.axis.x.rotate
-                tickWidth, tickHeight = self._getTickSize(cx, self.xticks, rotate)
+                tickWidth, tickHeight = self._getTickSize(cx, self.xticks,
+                                                          rotate)
                 label = unicode(self.options.axis.x.label)
                 x = self.area.x + self.area.w / 2.0
                 y = self.area.y + self.area.h + tickHeight + 4.0
-                self._renderAxisLabel(cx, tickWidth, tickHeight, label, x, y, False)
+                self._renderAxisLabel(cx, tickWidth, tickHeight, label, x, y,
+                                      False)
                 cx.restore()
 
-            # draws the horizontal line representing the X axis
-            cx.new_path()
-            cx.move_to(self.area.x, self.area.y + self.area.h)
-            cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
-            cx.close_path()
-            cx.stroke()
+            self._renderXAxis(cx)
 
         cx.restore()
 
