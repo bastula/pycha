@@ -59,8 +59,8 @@ class BarChart(Chart):
             cx.set_line_width(self.options.stroke.width)
 
             # gather bar proportions
-            x = self.area.w * bar.x + self.area.x
-            y = self.area.h * bar.y + self.area.y
+            x = self.area.x + self.area.w * bar.x
+            y = self.area.y + self.area.h * bar.y
             w = self.area.w * bar.w
             h = self.area.h * bar.h
 
