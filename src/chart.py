@@ -503,6 +503,10 @@ class Chart(object):
         if self.options.legend.hide:
             return
 
+        surfaceWidth = self.surface.get_width()
+        surfaceHeight = self.surface.get_height()
+
+        # Compute legend dimensions
         padding = 4
         bullet = 15
         width = 0
@@ -514,6 +518,18 @@ class Chart(object):
             height += max(extents[3], bullet) + padding
         width = padding + bullet + padding + width + padding
 
+        # Compute legend position
+        legend = self.options.legend
+        if legend.position.right is not None:
+            legend.position.left = (surfaceWidth
+                                    - legend.position.right
+                                    - width)
+        if legend.position.bottom is not None:
+            legend.position.top = (surfaceHeight
+                                   - legend.position.bottom
+                                   - height)
+
+        # Draw the legend
         cx.save()
         cx.rectangle(self.options.legend.position.left,
                      self.options.legend.position.top,
@@ -614,7 +630,7 @@ DEFAULT_OPTIONS = Option(
         borderColor='#000000',
         style={},
         hide=False,
-        position=Option(top=20, left=40),
+        position=Option(top=20, left=40, bottom=None, right=None),
     ),
     padding=Option(
         left=30,
