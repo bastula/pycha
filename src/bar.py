@@ -48,7 +48,7 @@ class BarChart(Chart):
             self.barWidthForSet = barWidth / len(stores)
             self.barMargin = (xdelta * self.xscale
                               * (1.0 - self.options.barWidthFillFraction) / 2)
-        
+
         self.minxdelta = xdelta
         self.bars = []
 
@@ -57,31 +57,31 @@ class BarChart(Chart):
 
         def drawBar(bar):
             cx.set_line_width(self.options.stroke.width)
-            
+
             # gather bar proportions
             x = self.area.w * bar.x + self.area.x
             y = self.area.h * bar.y + self.area.y
             w = self.area.w * bar.w
             h = self.area.h * bar.h
-            
+
             if w < 1 or h < 1:
                 return # don't draw when the bar is too small
-            
+
             if self.options.stroke.shadow:
                 cx.set_source_rgba(0, 0, 0, 0.15)
                 rectangle = self._getShadowRectangle(x, y, w, h)
                 cx.rectangle(*rectangle)
                 cx.fill()
-            
+
             if self.options.shouldFill:
                 cx.rectangle(x, y, w, h)
                 cx.set_source_rgb(*self.options.colorScheme[bar.name])
                 cx.fill_preserve()
-            
+
             if not self.options.stroke.hide:
                 cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
                 cx.stroke()
-        
+
         cx.save()
         for bar in self.bars:
             drawBar(bar)
@@ -102,7 +102,7 @@ class VerticalBarChart(BarChart):
                 h = (yval - self.minyval) * self.yscale
                 y = 1.0 - h
                 rect = Rect(x, y, w, h, xval, yval, name)
-                
+
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
@@ -131,7 +131,7 @@ class HorizontalBarChart(BarChart):
                 h = self.barWidthForSet
                 w = (yval - self.minyval) * self.yscale
                 rect = Rect(x, y, w, h, xval, yval, name)
-                
+
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
