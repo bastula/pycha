@@ -177,7 +177,7 @@ class Slice(object):
 
     def __str__(self):
         return ("<pycha.pie.Slice from %.2f to %.2f (%.2f%%)>" %
-                (self.startAngle, self.endAngle, self.fraction)
+                (self.startAngle, self.endAngle, self.fraction))
 
     def isBigEnough(self):
         return abs(self.startAngle - self.endAngle) > 0.001
