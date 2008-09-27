@@ -57,6 +57,8 @@ class GUI(object):
 
         self.main_window.show()
 
+
+    # Internal methods
     def _create_ui_manager(self):
         self.uimanager = gtk.UIManager()
         accel_group = self.uimanager.get_accel_group()
@@ -249,9 +251,7 @@ class GUI(object):
         action = action_group.get_action('verticalbar')
         return action.get_current_value()
 
-    def run(self):
-        gtk.main()
-
+    # Event and signal handlers
     def delete_event(self, widget, event, data=None):
         return False
 
@@ -277,6 +277,7 @@ class GUI(object):
         if self.surface is not None:
             self.refresh()
 
+    # Action handlers
     def quit(self, action):
         self.main_window.destroy()
 
@@ -373,7 +374,9 @@ class GUI(object):
         else:
             self.surface = None
 
-
+    # Public API
+    def run(self):
+        gtk.main()
 
 class TextInputDialog(gtk.Dialog):
 
