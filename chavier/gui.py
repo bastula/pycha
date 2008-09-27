@@ -58,8 +58,8 @@ class GUI(object):
         self.main_window.show()
 
     def _create_ui_manager(self):
-        uimanager = gtk.UIManager()
-        accel_group = uimanager.get_accel_group()
+        self.uimanager = gtk.UIManager()
+        accel_group = self.uimanager.get_accel_group()
         self.main_window.add_accel_group(accel_group)
 
         action_group = gtk.ActionGroup('default')
@@ -91,7 +91,19 @@ class GUI(object):
                 ('refresh', gtk.STOCK_REFRESH, None, '<ctrl>r',
                  'Update the chart', self.refresh),
                 ])
-        uimanager.insert_action_group(action_group, -1)
+        action_group.add_radio_actions([
+                ('verticalbar', None, '_Vertical bars', None,
+                 'Use vertical bars chart', self.app.VERTICAL_BAR_TYPE),
+                ('horizontalbar', None, '_Horizontal bars', None,
+                 'Use horizontal bars chart', self.app.HORIZONTAL_BAR_TYPE),
+                ('line', None, '_Line', None,
+                 'Use lines chart', self.app.LINE_TYPE),
+                ('pie', None, '_Pie', None,
+                 'Use pie chart', self.app.PIE_TYPE),
+                ('scatter', None, '_Scatter', None,
+                 'Use scatter chart', self.app.SCATTER_TYPE),
+                ], self.app.VERTICAL_BAR_TYPE, self.on_chart_type_change)
+        self.uimanager.insert_action_group(action_group, -1)
 
         ui = """<ui>
   <menubar name="MenuBar">
@@ -109,6 +121,12 @@ class GUI(object):
     </menu>
     <menu action="view">
       <menuitem action="refresh"/>
+      <separator />
+      <menuitem action="verticalbar"/>
+      <menuitem action="horizontalbar"/>
+      <menuitem action="line"/>
+      <menuitem action="pie"/>
+      <menuitem action="scatter"/>
     </menu>
   </menubar>
   <toolbar name="ToolBar">
@@ -124,10 +142,10 @@ class GUI(object):
   </toolbar>
 </ui>
 """
-        uimanager.add_ui_from_string(ui)
-        uimanager.ensure_update()
-        menubar = uimanager.get_widget('/MenuBar')
-        toolbar = uimanager.get_widget('/ToolBar')
+        self.uimanager.add_ui_from_string(ui)
+        self.uimanager.ensure_update()
+        menubar = self.uimanager.get_widget('/MenuBar')
+        toolbar = self.uimanager.get_widget('/ToolBar')
 
         return menubar, toolbar
 
@@ -222,8 +240,14 @@ class GUI(object):
             treeview = tab.get_children()[0]
             model = treeview.get_model()
             points = [(x, y) for x, y in model]
-            datasets.append((name, points))
+            if len(points) > 0:
+                datasets.append((name, points))
         return datasets
+
+    def _get_chart_type(self):
+        action_group = self.uimanager.get_action_groups()[0]
+        action = action_group.get_action('verticalbar')
+        return action.get_current_value()
 
     def run(self):
         gtk.main()
@@ -249,6 +273,10 @@ class GUI(object):
         if self.surface is not None:
             self.refresh()
 
+    def on_chart_type_change(self, action, current, data=None):
+        if self.surface is not None:
+            self.refresh()
+
     def quit(self, action):
         self.main_window.destroy()
 
@@ -260,6 +288,7 @@ class GUI(object):
         if response == gtk.RESPONSE_ACCEPT:
             name = dialog.get_name()
             self._create_dataset(name)
+            self.datasets_notebook.set_current_page(n_pages)
         dialog.destroy()
 
     def remove_dataset(self, action):
@@ -333,12 +362,16 @@ class GUI(object):
 
     def refresh(self, action=None):
         datasets = self._get_datasets()
-#        options = self._get_options()
+        if datasets:
+#            options = self._get_options()
 
-        alloc = self.drawing_area.get_allocation()
-        self.surface = self.app.get_chart(datasets, None,
-                                          alloc.width, alloc.height)
-        self.drawing_area.queue_draw()
+            chart_type = self._get_chart_type()
+            alloc = self.drawing_area.get_allocation()
+            self.surface = self.app.get_chart(datasets, None, chart_type,
+                                              alloc.width, alloc.height)
+            self.drawing_area.queue_draw()
+        else:
+            self.surface = None
 
 
 
