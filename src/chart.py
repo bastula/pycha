@@ -628,7 +628,6 @@ DEFAULT_OPTIONS = Option(
     legend=Option(
         opacity=0.8,
         borderColor='#000000',
-        style={},
         hide=False,
         position=Option(top=20, left=40, bottom=None, right=None),
     ),
