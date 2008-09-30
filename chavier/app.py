@@ -24,6 +24,76 @@ class App(object):
      PIE_TYPE,
      SCATTER_TYPE) = range(len(CHART_TYPES))
 
+    OPTIONS_TYPES = dict(
+        axis=dict(
+            lineWidth=float,
+            lineColor=str,
+            tickSize=float,
+            labelColor=str,
+            labelFont=str,
+            labelFontSize=int,
+            labelWidth=float,
+            x=dict(
+                hide=bool,
+                ticks=list,
+                tickCount=int,
+                tickPrecision=int,
+                range=list,
+                rotate=float,
+                label=unicode,
+                ),
+            y=dict(
+                hide=bool,
+                ticks=list,
+                tickCount=int,
+                tickPrecision=int,
+                range=list,
+                rotate=float,
+                label=unicode,
+                ),
+            ),
+        background=dict(
+            hide=bool,
+            baseColor=str,
+            chartColor=str,
+            lineColor=str,
+            lineWidth=float,
+            ),
+        legend=dict(
+            opacity=float,
+            borderColor=str,
+            hide=bool,
+            position=dict(
+                top=int,
+                left=int,
+                bottom=int,
+                right=int,
+                )
+            ),
+        padding=dict(
+            left=int,
+            right=int,
+            top=int,
+            bottom=int,
+            ),
+        stroke=dict(
+            color=str,
+            hide=bool,
+            shadow=bool,
+            width=int,
+            ),
+        fillOpacity=float,
+        shouldFill=bool,
+        barWidthFillFraction=float,
+        xOriginIsZero=bool,
+        yOriginIsZero=bool,
+        pieRadius=float,
+        colorScheme=str,
+        title=unicode,
+        titleFont=str,
+        titleFontSize=int,
+        )
+
     def __init__(self):
         self.gui = GUI(self)
 

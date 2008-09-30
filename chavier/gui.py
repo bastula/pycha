@@ -88,6 +88,9 @@ class GUI(object):
                 ('edit_point', gtk.STOCK_EDIT, 'Edit po_int', '<ctrl>e',
                  'Edit the current point of the current dataset',
                  self.edit_point),
+                ('edit_option', gtk.STOCK_EDIT, 'Edit op_tion', None,
+                 'Edit the current option',
+                 self.edit_option),
 
                 ('view', None, '_View', None, 'View', None),
                 ('refresh', gtk.STOCK_REFRESH, None, '<ctrl>r',
@@ -120,6 +123,8 @@ class GUI(object):
       <menuitem action="add_point"/>
       <menuitem action="remove_point"/>
       <menuitem action="edit_point"/>
+      <separator />
+      <menuitem action="edit_option"/>
     </menu>
     <menu action="view">
       <menuitem action="refresh"/>
@@ -189,37 +194,39 @@ class GUI(object):
         return scrolled_window
 
     def _options_treeview_creator(self):
-        self.options_store = gtk.TreeStore(str, str)
+        self.options_store = gtk.TreeStore(str, str, object)
         options = self.app.get_default_options()
-        self._fill_options_store(options, None)
+        self._fill_options_store(options, None, self.app.OPTIONS_TYPES)
 
-        treeview = gtk.TreeView(self.options_store)
+        self.options_treeview = gtk.TreeView(self.options_store)
 
         column1 = gtk.TreeViewColumn('Name', gtk.CellRendererText(), text=0)
-        treeview.append_column(column1)
+        self.options_treeview.append_column(column1)
 
         column2 = gtk.TreeViewColumn('Value', gtk.CellRendererText(), text=1)
-        treeview.append_column(column2)
+        self.options_treeview.append_column(column2)
 
-        treeview.expand_all()
+        self.options_treeview.expand_all()
 
         scrolled_window = gtk.ScrolledWindow()
         scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        scrolled_window.add(treeview)
-        treeview.show()
+        scrolled_window.add(self.options_treeview)
+        self.options_treeview.show()
 
         return scrolled_window
 
-    def _fill_options_store(self, options, parent_node):
+    def _fill_options_store(self, options, parent_node, types):
         for name, value in options.items():
+            value_type = types[name]
             if isinstance(value, dict):
-                current_parent = self.options_store.append(parent_node, (name, None))
-                self._fill_options_store(value, current_parent)
+                current_parent = self.options_store.append(parent_node, (name, None, None))
+                self._fill_options_store(value, current_parent, value_type)
 
             else:
+                print value_type
                 if value is not None:
                     value = str(value)
-                self.options_store.append(parent_node, (name, value))
+                self.options_store.append(parent_node, (name, value, value_type))
 
     def _get_current_dataset_tab(self):
         current_tab = self.datasets_notebook.get_current_page()
@@ -250,6 +257,21 @@ class GUI(object):
         action_group = self.uimanager.get_action_groups()[0]
         action = action_group.get_action('verticalbar')
         return action.get_current_value()
+
+    def _get_options(self, iter):
+        options = {}
+        first_child = self.options_store.iter_children(iter)
+        if first_child is not None:
+            name = self.options_store.get_value(iter, 0)
+            options[name] = self._get_options(first_child)
+
+        iter = self.options_store.iter_next(iter)
+        while iter is not None:
+            name = self.options_store.get_value(iter, 0)
+            options[name] = self._get_options(iter)
+            iter = self.options_store.iter_next(iter)
+
+        return options
 
     # Event and signal handlers
     def delete_event(self, widget, event, data=None):
@@ -361,10 +383,36 @@ class GUI(object):
             self.refresh()
         dialog.destroy()
 
+    def edit_option(self, action):
+        selection = self.options_treeview.get_selection()
+        model, selected = selection.get_selected()
+        if selected is None:
+            warning(self.main_window, "You must select the option to edit")
+            return
+
+        name, value, value_type = model.get(selected, 0, 1, 2)
+        parents = []
+        parent = model.iter_parent(selected)
+        while parent is not None:
+            parents.append(model.get_value(parent, 0))
+            parent = model.iter_parent(parent)
+        parents.reverse()
+        parents.append(name)
+        label = u'.'.join(parents)
+
+        dialog = OptionDialog(self.main_window, label, value, value_type)
+        response = dialog.run()
+        if response == gtk.RESPONSE_ACCEPT:
+            new_value = dialog.get_value()
+            model.set_value(selected, 1, new_value)
+            self.refresh()
+        dialog.destroy()
+
     def refresh(self, action=None):
         datasets = self._get_datasets()
         if datasets:
-#            options = self._get_options()
+            root = self.options_store.get_iter_first()
+            options = self._get_options(root)
 
             chart_type = self._get_chart_type()
             alloc = self.drawing_area.get_allocation()
@@ -414,7 +462,7 @@ class PointDialog(gtk.Dialog):
         flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
-        super(PointDialog, self).__init__(u'Enter a name for the dataset',
+        super(PointDialog, self).__init__(u'Enter the point values',
                                           toplevel_window, flags, buttons)
 
         initials = {u'x': str(initial_x), u'y': str(initial_y)}
@@ -442,6 +490,36 @@ class PointDialog(gtk.Dialog):
     def get_point(self):
         return (float(self.entries[u'x'].get_text()),
                 float(self.entries[u'y'].get_text()))
+
+
+class OptionDialog(gtk.Dialog):
+    def __init__(self, toplevel_window, label, value, value_type):
+        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+        buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        super(OptionDialog, self).__init__(u'Enter the option value',
+                                           toplevel_window, flags, buttons)
+
+
+        hbox = gtk.HBox(spacing=6)
+        hbox.set_border_width(12)
+
+        label = gtk.Label(label)
+        hbox.pack_start(label, False, False)
+
+        self.entry = gtk.Entry()
+        self.entry.set_text(value)
+        self.entry.set_activates_default(True)
+        hbox.pack_start(self.entry, True, True)
+
+        self.vbox.pack_start(hbox, False, False)
+
+        self.vbox.show_all()
+
+        self.set_default_response(gtk.RESPONSE_ACCEPT)
+
+    def get_value(self):
+        return self.entry.get_text()
 
 
 def warning(window, msg):
