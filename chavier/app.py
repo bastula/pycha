@@ -1,3 +1,20 @@
+# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+#
+# This file is part of Chavier.
+#
+# Chavier is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Chavier is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with Chavier.  If not, see <http://www.gnu.org/licenses/>.
+
 import cairo
 
 from pycha.chart import DEFAULT_OPTIONS
@@ -106,7 +123,7 @@ class App(object):
     def get_chart(self, datasets, options, chart_type, width, height):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         chart_factory = self.CHART_TYPES[chart_type]
-        chart = chart_factory(surface, DEFAULT_OPTIONS)
+        chart = chart_factory(surface, options)
         chart.addDataset(datasets)
         chart.render()
         return surface

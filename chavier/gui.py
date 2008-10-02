@@ -1,6 +1,28 @@
+# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+#
+# This file is part of Chavier.
+#
+# Chavier is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Chavier is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with Chavier.  If not, see <http://www.gnu.org/licenses/>.
+
 import pygtk
 pygtk.require('2.0')
 import gtk
+
+from chavier.dialogs import (
+    TextInputDialog, PointDialog, OptionDialog, RandomGeneratorDialog,
+    AboutDialog,
+    )
 
 class GUI(object):
     def __init__(self, app):
@@ -95,6 +117,14 @@ class GUI(object):
                 ('view', None, '_View', None, 'View', None),
                 ('refresh', gtk.STOCK_REFRESH, None, '<ctrl>r',
                  'Update the chart', self.refresh),
+
+                ('tools', None, '_Tools', None, 'Tools', None),
+                ('random-points', gtk.STOCK_EXECUTE, '_Generate random points',
+                 '<ctrl>g', 'Generate random points',
+                 self.generate_random_points),
+                ('help', None, '_Help', None, 'Help', None),
+                ('about', gtk.STOCK_ABOUT, None, None, 'About this program',
+                 self.about),
                 ])
         action_group.add_radio_actions([
                 ('verticalbar', None, '_Vertical bars', None,
@@ -134,6 +164,12 @@ class GUI(object):
       <menuitem action="line"/>
       <menuitem action="pie"/>
       <menuitem action="scatter"/>
+    </menu>
+    <menu action="tools">
+      <menuitem action="random-points"/>
+    </menu>
+    <menu action="help">
+      <menuitem action="about"/>
     </menu>
   </menubar>
   <toolbar name="ToolBar">
@@ -186,6 +222,8 @@ class GUI(object):
         column2 = gtk.TreeViewColumn('y', gtk.CellRendererText(), text=1)
         treeview.append_column(column2)
 
+        treeview.connect('row-activated', self.dataset_treeview_row_activated)
+
         scrolled_window = gtk.ScrolledWindow()
         scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrolled_window.add(treeview)
@@ -208,6 +246,9 @@ class GUI(object):
 
         self.options_treeview.expand_all()
 
+        self.options_treeview.connect('row-activated',
+                                      self.options_treeview_row_activated)
+
         scrolled_window = gtk.ScrolledWindow()
         scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrolled_window.add(self.options_treeview)
@@ -219,11 +260,11 @@ class GUI(object):
         for name, value in options.items():
             value_type = types[name]
             if isinstance(value, dict):
-                current_parent = self.options_store.append(parent_node, (name, None, None))
+                current_parent = self.options_store.append(parent_node,
+                                                           (name, None, None))
                 self._fill_options_store(value, current_parent, value_type)
 
             else:
-                print value_type
                 if value is not None:
                     value = str(value)
                 self.options_store.append(parent_node, (name, value, value_type))
@@ -260,18 +301,52 @@ class GUI(object):
 
     def _get_options(self, iter):
         options = {}
-        first_child = self.options_store.iter_children(iter)
-        if first_child is not None:
-            name = self.options_store.get_value(iter, 0)
-            options[name] = self._get_options(first_child)
-
-        iter = self.options_store.iter_next(iter)
         while iter is not None:
-            name = self.options_store.get_value(iter, 0)
-            options[name] = self._get_options(iter)
+            name, value, value_type  = self.options_store.get(iter, 0, 1, 2)
+            if value_type is None:
+                child = self.options_store.iter_children(iter)
+                options[name] = self._get_options(child)
+            else:
+                if value is not None:
+                    converter = str_converters[value_type]
+                    value = converter(value)
+                options[name] = value
+
             iter = self.options_store.iter_next(iter)
 
         return options
+
+    def _edit_point_internal(self, model, iter):
+        x, y = model.get(iter, 0, 1)
+
+        dialog = PointDialog(self.main_window, x, y)
+        response = dialog.run()
+        if response == gtk.RESPONSE_ACCEPT:
+            x, y = dialog.get_point()
+            model.set(iter, 0, x, 1, y)
+            self.refresh()
+        dialog.destroy()
+
+    def _edit_option_internal(self, model, iter):
+        name, value, value_type = model.get(iter, 0, 1, 2)
+        parents = []
+        parent = model.iter_parent(iter)
+        while parent is not None:
+            parents.append(model.get_value(parent, 0))
+            parent = model.iter_parent(parent)
+        parents.reverse()
+        parents.append(name)
+        label = u'.'.join(parents)
+
+        dialog = OptionDialog(self.main_window, label, value, value_type)
+        response = dialog.run()
+        if response == gtk.RESPONSE_ACCEPT:
+            new_value = dialog.get_value()
+            if new_value == "":
+                new_value = None
+            model.set_value(iter, 1, new_value)
+            self.refresh()
+        dialog.destroy()
 
     # Event and signal handlers
     def delete_event(self, widget, event, data=None):
@@ -298,6 +373,16 @@ class GUI(object):
     def on_chart_type_change(self, action, current, data=None):
         if self.surface is not None:
             self.refresh()
+
+    def dataset_treeview_row_activated(self, treeview, path, view_column):
+        model = treeview.get_model()
+        iter = model.get_iter(path)
+        self._edit_point_internal(model, iter)
+
+    def options_treeview_row_activated(self, treeview, path, view_column):
+        model = treeview.get_model()
+        iter = model.get_iter(path)
+        self._edit_option_internal(model, iter)
 
     # Action handlers
     def quit(self, action):
@@ -373,15 +458,7 @@ class GUI(object):
             warning(self.main_window, "You must select the point to edit")
             return
 
-        x, y = model.get(selected, 0, 1)
-
-        dialog = PointDialog(self.main_window, x, y)
-        response = dialog.run()
-        if response == gtk.RESPONSE_ACCEPT:
-            x, y = dialog.get_point()
-            model.set(selected, 0, x, 1, y)
-            self.refresh()
-        dialog.destroy()
+        self._edit_point_internal(model, selected)
 
     def edit_option(self, action):
         selection = self.options_treeview.get_selection()
@@ -390,23 +467,7 @@ class GUI(object):
             warning(self.main_window, "You must select the option to edit")
             return
 
-        name, value, value_type = model.get(selected, 0, 1, 2)
-        parents = []
-        parent = model.iter_parent(selected)
-        while parent is not None:
-            parents.append(model.get_value(parent, 0))
-            parent = model.iter_parent(parent)
-        parents.reverse()
-        parents.append(name)
-        label = u'.'.join(parents)
-
-        dialog = OptionDialog(self.main_window, label, value, value_type)
-        response = dialog.run()
-        if response == gtk.RESPONSE_ACCEPT:
-            new_value = dialog.get_value()
-            model.set_value(selected, 1, new_value)
-            self.refresh()
-        dialog.destroy()
+        self._edit_option_internal(model, selected)
 
     def refresh(self, action=None):
         datasets = self._get_datasets()
@@ -416,115 +477,48 @@ class GUI(object):
 
             chart_type = self._get_chart_type()
             alloc = self.drawing_area.get_allocation()
-            self.surface = self.app.get_chart(datasets, None, chart_type,
+            self.surface = self.app.get_chart(datasets, options, chart_type,
                                               alloc.width, alloc.height)
             self.drawing_area.queue_draw()
         else:
             self.surface = None
 
+    def generate_random_points(self, action=None):
+        tab = self._get_current_dataset_tab()
+        assert tab is not None
+
+        treeview = tab.get_children()[0]
+        model = treeview.get_model()
+
+        dialog = RandomGeneratorDialog(self.main_window)
+        response = dialog.run()
+        if response == gtk.RESPONSE_ACCEPT:
+            points = dialog.generate_points()
+            for point in points:
+                model.append(point)
+            self.refresh()
+        dialog.destroy()
+
+    def about(self, action=None):
+        dialog = AboutDialog(self.main_window)
+        dialog.run()
+        dialog.destroy()
+
     # Public API
     def run(self):
         gtk.main()
 
-class TextInputDialog(gtk.Dialog):
 
-    def __init__(self, toplevel_window, suggested_name):
-        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
-        buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
-        super(TextInputDialog, self).__init__(u'Enter a name for the dataset',
-                                              toplevel_window, flags, buttons)
-        self.set_default_size(300, -1)
+def str2bool(str):
+    if str.lower() == "true":
+        return True
+    else:
+        return False
 
-        hbox = gtk.HBox(spacing=6)
-        hbox.set_border_width(12)
-
-        label = gtk.Label(u'Name')
-        hbox.pack_start(label, False, False)
-
-        self.entry = gtk.Entry()
-        self.entry.set_text(suggested_name)
-        self.entry.set_activates_default(True)
-        hbox.pack_start(self.entry, True, True)
-
-        self.vbox.pack_start(hbox, False, False)
-
-        self.vbox.show_all()
-
-        self.set_default_response(gtk.RESPONSE_ACCEPT)
-
-    def get_name(self):
-        return self.entry.get_text()
-
-
-class PointDialog(gtk.Dialog):
-    def __init__(self, toplevel_window, initial_x, initial_y):
-        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
-        buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
-        super(PointDialog, self).__init__(u'Enter the point values',
-                                          toplevel_window, flags, buttons)
-
-        initials = {u'x': str(initial_x), u'y': str(initial_y)}
-        self.entries = {}
-        for coordinate in (u'x', u'y'):
-            hbox = gtk.HBox(spacing=6)
-            hbox.set_border_width(12)
-
-            label = gtk.Label(coordinate)
-            hbox.pack_start(label, False, False)
-
-            entry = gtk.Entry()
-            entry.set_activates_default(True)
-            entry.set_text(initials[coordinate])
-            hbox.pack_start(entry, True, True)
-
-            self.entries[coordinate] = entry
-
-            self.vbox.pack_start(hbox, False, False)
-
-        self.vbox.show_all()
-
-        self.set_default_response(gtk.RESPONSE_ACCEPT)
-
-    def get_point(self):
-        return (float(self.entries[u'x'].get_text()),
-                float(self.entries[u'y'].get_text()))
-
-
-class OptionDialog(gtk.Dialog):
-    def __init__(self, toplevel_window, label, value, value_type):
-        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
-        buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
-        super(OptionDialog, self).__init__(u'Enter the option value',
-                                           toplevel_window, flags, buttons)
-
-
-        hbox = gtk.HBox(spacing=6)
-        hbox.set_border_width(12)
-
-        label = gtk.Label(label)
-        hbox.pack_start(label, False, False)
-
-        self.entry = gtk.Entry()
-        self.entry.set_text(value)
-        self.entry.set_activates_default(True)
-        hbox.pack_start(self.entry, True, True)
-
-        self.vbox.pack_start(hbox, False, False)
-
-        self.vbox.show_all()
-
-        self.set_default_response(gtk.RESPONSE_ACCEPT)
-
-    def get_value(self):
-        return self.entry.get_text()
-
-
-def warning(window, msg):
-    dialog = gtk.MessageDialog(window,
-                               gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
-                               gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, msg)
-    dialog.run()
-    dialog.destroy()
+str_converters = {
+    str: str,
+    int: int,
+    float: float,
+    unicode: unicode,
+    bool: str2bool,
+}
