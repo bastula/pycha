@@ -21,13 +21,14 @@ import gtk
 
 from chavier.dialogs import (
     TextInputDialog, PointDialog, OptionDialog, RandomGeneratorDialog,
-    AboutDialog,
+    AboutDialog, warning
     )
 
 class GUI(object):
     def __init__(self, app):
         self.app = app
 
+        self.chart = None
         self.surface = None
 
         self.main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -122,6 +123,9 @@ class GUI(object):
                 ('random-points', gtk.STOCK_EXECUTE, '_Generate random points',
                  '<ctrl>g', 'Generate random points',
                  self.generate_random_points),
+                ('dump-chart-state', gtk.STOCK_CONVERT, '_Dump chart state',
+                 '<ctrl>d', 'Dump internal chart variables',
+                 self.dump_chart_state),
                 ('help', None, '_Help', None, 'Help', None),
                 ('about', gtk.STOCK_ABOUT, None, None, 'About this program',
                  self.about),
@@ -167,6 +171,7 @@ class GUI(object):
     </menu>
     <menu action="tools">
       <menuitem action="random-points"/>
+      <menuitem action="dump-chart-state"/>
     </menu>
     <menu action="help">
       <menuitem action="about"/>
@@ -356,22 +361,22 @@ class GUI(object):
         gtk.main_quit()
 
     def drawing_area_expose_event(self, widget, event, data=None):
-        if self.surface is None:
+        if self.chart is None:
             return
 
         cr = widget.window.cairo_create()
         cr.rectangle(event.area.x, event.area.y,
                      event.area.width, event.area.height)
         cr.clip()
-        cr.set_source_surface(self.surface, 0, 0)
+        cr.set_source_surface(self.chart.surface, 0, 0)
         cr.paint()
 
     def drawing_area_size_allocate_event(self, widget, event, data=None):
-        if self.surface is not None:
+        if self.chart is not None:
             self.refresh()
 
     def on_chart_type_change(self, action, current, data=None):
-        if self.surface is not None:
+        if self.chart is not None:
             self.refresh()
 
     def dataset_treeview_row_activated(self, treeview, path, view_column):
@@ -477,11 +482,11 @@ class GUI(object):
 
             chart_type = self._get_chart_type()
             alloc = self.drawing_area.get_allocation()
-            self.surface = self.app.get_chart(datasets, options, chart_type,
-                                              alloc.width, alloc.height)
+            self.chart = self.app.get_chart(datasets, options, chart_type,
+                                            alloc.width, alloc.height)
             self.drawing_area.queue_draw()
         else:
-            self.surface = None
+            self.chart = None
 
     def generate_random_points(self, action=None):
         tab = self._get_current_dataset_tab()
@@ -498,6 +503,25 @@ class GUI(object):
                 model.append(point)
             self.refresh()
         dialog.destroy()
+
+    def dump_chart_state(self, action=None):
+        if self.chart is None:
+            return
+
+        alloc = self.drawing_area.get_allocation()
+
+        print 'CHART STATE'
+        print '-' * 70
+        print 'surface: %d x %d' % (alloc.width, alloc.height)
+        print 'area   :', self.chart.area
+        print
+        print 'minxval:', self.chart.minxval
+        print 'maxxval:', self.chart.maxxval
+        print 'xrange :', self.chart.xrange
+        print
+        print 'minyval:', self.chart.minyval
+        print 'maxyval:', self.chart.maxyval
+        print 'yrange :', self.chart.yrange
 
     def about(self, action=None):
         dialog = AboutDialog(self.main_window)

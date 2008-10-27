@@ -59,7 +59,8 @@ class PieChart(Chart):
         """Evaluates pie ticks"""
         self.xticks = []
         if self.options.axis.x.ticks:
-            lookup = dict([(slice.xval, slice) for slice in self.slices])
+#            lookup = dict([(slice.xval, slice) for slice in self.slices])
+            lookup = dict([(slice.name, slice) for slice in self.slices])
             for tick in self.options.axis.x.ticks:
                 if not isinstance(tick, Option):
                     tick = Option(tick)
@@ -70,8 +71,10 @@ class PieChart(Chart):
                     self.xticks.append((tick.v, label))
         else:
             for slice in self.slices:
-                label = '%s (%.1f%%)' % (slice.xval, slice.fraction * 100)
-                self.xticks.append((slice.xval, label))
+#                label = '%s (%.1f%%)' % (slice.xval, slice.fraction * 100)
+#                self.xticks.append((slice.xval, label))
+                label = '%s (%.1f%%)' % (slice.name, slice.fraction * 100)
+                self.xticks.append((slice.name, label))
 
     def _renderBackground(self, cx):
         """Renders the background of the chart"""
@@ -129,7 +132,8 @@ class PieChart(Chart):
             return
 
         self.xlabels = []
-        lookup = dict([(slice.xval, slice) for slice in self.slices])
+#        lookup = dict([(slice.xval, slice) for slice in self.slices])
+        lookup = dict([(slice.name, slice) for slice in self.slices])
 
         cx.set_source_rgb(*hex2rgb(self.options.axis.labelColor))
 

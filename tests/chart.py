@@ -44,6 +44,9 @@ class AreaTests(unittest.TestCase):
         self.assertEqual(area.y, 20)
         self.assertEqual(area.w, 100)
         self.assertEqual(area.h, 300)
+        self.assertEqual(area.origin, 0.0)
+        msg = "<pycha.chart.Area@(10.00, 20.00) 100.00 x 300.00 Origin: 0.00>"
+        self.assertEqual(str(area), msg)
 
 class OptionTests(unittest.TestCase):
     
@@ -163,7 +166,7 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.yrange, 4)
         self.assertEqual(ch.yscale, 1/4.0)
         
-        # TODO: test with different options (xOriginIsZero, axis.range, ...)
+        # TODO: test with different options (axis.range, ...)
 
     def test_updateTicks(self):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
@@ -176,7 +179,7 @@ class ChartTests(unittest.TestCase):
         ch.addDataset(dataset)
         ch._updateXY()
         ch._updateTicks()
-        xticks = [(0.0, 1), (1/3.0, 2), (2/3.0, 3)]
+        xticks = [(0.0, 0), (1/3.0, 1), (2/3.0, 2)]
         for i in range(len(xticks)):
             self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
             self.assertAlmostEqual(ch.xticks[i][1], xticks[i][1], 4)
@@ -188,7 +191,7 @@ class ChartTests(unittest.TestCase):
             self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
             self.assertAlmostEqual(ch.yticks[i][1], yticks[i][1], 4)
 
-    def test_updateExplicitTicks(self):
+    def _test_updateExplicitTicks(self):
         """Test for bug #7"""
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
         yticks = [dict(v=i, label=str(i)) for i in range(0, 3)]

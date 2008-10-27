@@ -132,7 +132,7 @@ class RandomGeneratorDialog(gtk.Dialog):
         self.number = self._create_spin_button('Number of points to generate',
                                                0, 1, 5, 1, 1000, 10)
         self.min = self._create_spin_button('Minimum y value',
-                                            2, 0.5, 1, 0, 1000, 0)
+                                            2, 0.5, 1, -1000, 1000, 0)
         self.max = self._create_spin_button('Maximum y value',
                                             2, 0.5, 1, 0, 1000, 10)
 

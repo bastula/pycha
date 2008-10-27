@@ -64,6 +64,7 @@ class App(object):
                 ticks=list,
                 tickCount=int,
                 tickPrecision=int,
+                interval=int,
                 range=list,
                 rotate=float,
                 label=unicode,
@@ -102,8 +103,6 @@ class App(object):
         fillOpacity=float,
         shouldFill=bool,
         barWidthFillFraction=float,
-        xOriginIsZero=bool,
-        yOriginIsZero=bool,
         pieRadius=float,
         colorScheme=str,
         title=unicode,
@@ -126,7 +125,7 @@ class App(object):
         chart = chart_factory(surface, options)
         chart.addDataset(datasets)
         chart.render()
-        return surface
+        return chart
 
 if __name__ == '__main__':
     app = App()

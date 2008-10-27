@@ -16,7 +16,7 @@
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
 from pycha.chart import Chart, uniqueIndices
-from pycha.color import hex2rgb, clamp
+from pycha.color import hex2rgb
 
 class BarChart(Chart):
 
@@ -27,6 +27,12 @@ class BarChart(Chart):
         self.barWidthForSet = 0.0
         self.barMargin = 0.0
 
+    def _updateXY(self):
+        super(BarChart, self)._updateXY()
+        # each dataset is centered around a line segment. that's why we
+        # need n + 1 divisions on the x axis
+        self.xscale = 1 / (self.xrange + 1.0)
+
     def _updateChart(self):
         """Evaluates measures for vertical bars"""
         stores = self._getDatasetsValues()
@@ -35,15 +41,12 @@ class BarChart(Chart):
         barWidth = 0
         if len(uniqx) == 1:
             xdelta = 1.0
-            self.xscale = 1.0
-            self.minxval = uniqx[0]
             barWidth = 1.0 * self.options.barWidthFillFraction
             self.barWidthForSet = barWidth / len(stores)
             self.barMargin = (1.0 - self.options.barWidthFillFraction) / 2
         else:
             xdelta = min([abs(uniqx[j] - uniqx[j-1])
                           for j in range(1, len(uniqx))])
-            self.xscale = 1.0 / (self.xrange + 1)
             barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
             self.barWidthForSet = barWidth / len(stores)
             self.barMargin = (xdelta * self.xscale
@@ -56,7 +59,11 @@ class BarChart(Chart):
         """Renders a horizontal/vertical bar chart"""
 
         def drawBar(bar):
-            cx.set_line_width(self.options.stroke.width)
+            stroke_width = self.options.stroke.width
+            ux, uy = cx.device_to_user_distance(stroke_width, stroke_width)
+            if ux < uy:
+                ux = uy
+            cx.set_line_width(ux)
 
             # gather bar proportions
             x = self.area.x + self.area.w * bar.x
@@ -73,14 +80,16 @@ class BarChart(Chart):
                 cx.rectangle(*rectangle)
                 cx.fill()
 
-            if self.options.shouldFill:
+            if self.options.shouldFill or (not self.options.stroke.hide):
                 cx.rectangle(x, y, w, h)
-                cx.set_source_rgb(*self.options.colorScheme[bar.name])
-                cx.fill_preserve()
 
-            if not self.options.stroke.hide:
-                cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
-                cx.stroke()
+                if self.options.shouldFill:
+                    cx.set_source_rgb(*self.options.colorScheme[bar.name])
+                    cx.fill_preserve()
+    
+                if not self.options.stroke.hide:
+                    cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
+                    cx.stroke()
 
         cx.save()
         for bar in self.bars:
@@ -92,15 +101,17 @@ class VerticalBarChart(BarChart):
     def _updateChart(self):
         """Evaluates measures for vertical bars"""
         super(VerticalBarChart, self)._updateChart()
-
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
                 x = (((xval - self.minxval) * self.xscale)
-                    + (i * self.barWidthForSet) + self.barMargin)
+                    + self.barMargin + (i * self.barWidthForSet))
                 w = self.barWidthForSet
-                h = (yval - self.minyval) * self.yscale
-                y = 1.0 - h
+                h = abs(yval) * self.yscale
+                if yval > 0:
+                    y = (1.0 - h) - self.area.origin
+                else:
+                    y = 1 - self.area.origin
                 rect = Rect(x, y, w, h, xval, yval, name)
 
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
@@ -126,10 +137,13 @@ class HorizontalBarChart(BarChart):
             for item in store:
                 xval, yval = item
                 y = (((xval - self.minxval) * self.xscale)
-                     + (i * self.barWidthForSet) + self.barMargin)
-                x = 0.0
+                     + self.barMargin  + (i * self.barWidthForSet))
                 h = self.barWidthForSet
-                w = (yval - self.minyval) * self.yscale
+                w = abs(yval) * self.yscale
+                if yval > 0:
+                    x = self.area.origin
+                else:
+                    x = self.area.origin - w
                 rect = Rect(x, y, w, h, xval, yval, name)
 
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
@@ -152,6 +166,23 @@ class HorizontalBarChart(BarChart):
     def _getShadowRectangle(self, x, y, w, h):
         return (x, y-2, w+2, h+4)
 
+    def _renderXAxis(self, cx):
+        """Draws the horizontal line representing the X axis"""
+        cx.new_path()
+        cx.move_to(self.area.x, self.area.y + self.area.h)
+        cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
+        cx.close_path()
+        cx.stroke()
+
+    def _renderYAxis(self, cx):
+        # draws the vertical line representing the Y axis
+        cx.new_path()
+        cx.move_to(self.area.x + self.area.origin * self.area.w,
+                   self.area.y)
+        cx.line_to(self.area.x + self.area.origin * self.area.w,
+                   self.area.y + self.area.h)
+        cx.close_path()
+        cx.stroke()
 
 class Rect(object):
     def __init__(self, x, y, w, h, xval, yval, name):
@@ -160,5 +191,6 @@ class Rect(object):
         self.name = name
 
     def __str__(self):
-        return "<pycha.bar.Rect@(%.2f, %.2f) %.2fx%.2f>" % (self.x, self.y,
-                                                            self.w, self.h)
+        return ("<pycha.bar.Rect@(%.2f, %.2f) %.2fx%.2f (%.2f, %.2f) %s>"
+                % (self.x, self.y, self.w, self.h, self.xval, self.yval,
+                   self.name))

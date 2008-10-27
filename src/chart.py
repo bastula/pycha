@@ -138,28 +138,21 @@ class Chart(object):
 
     def _updateXY(self):
         """Calculates all kinds of metrics for the x and y axis"""
-        stores = self._getDatasetsValues()
+        x_range_is_defined = self.options.axis.x.range is not None
+        y_range_is_defined = self.options.axis.y.range is not None
 
-        # calculate area data
-        width = (self.surface.get_width()
-                 - self.options.padding.left - self.options.padding.right)
-        height = (self.surface.get_height()
-                  - self.options.padding.top - self.options.padding.bottom)
-        self.area = Area(self.options.padding.left,
-                         self.options.padding.top,
-                         width, height)
+        if not x_range_is_defined or not y_range_is_defined:
+            stores = self._getDatasetsValues()
 
         # gather data for the x axis
-        if self.options.axis.x.range:
+        if x_range_is_defined:
             self.minxval, self.maxxval = self.options.axis.x.range
-            self.xscale = self.maxxval - self.minxval
         else:
             xdata = [pair[0] for pair in reduce(lambda a,b: a+b, stores)]
-            if self.options.xOriginIsZero:
-                self.minxval = 0.0
-            else:
-                self.minxval = float(min(xdata))
+            self.minxval = float(min(xdata))
             self.maxxval = float(max(xdata))
+            if self.minxval * self.maxxval > 0 and self.minxval > 0:
+                self.minxval = 0.0
 
         self.xrange = self.maxxval - self.minxval
         if self.xrange == 0:
@@ -168,22 +161,35 @@ class Chart(object):
             self.xscale = 1 / self.xrange
 
         # gather data for the y axis
-        if self.options.axis.y.range:
+        if y_range_is_defined:
             self.minyval, self.maxyval = self.options.axis.y.range
-            self.yscale = self.maxyval - self.minyval
         else:
             ydata = [pair[1] for pair in reduce(lambda a,b: a+b, stores)]
-            if self.options.yOriginIsZero:
-                self.minyval = 0.0
-            else:
-                self.minyval = float(min(ydata))
+            self.minyval = float(min(ydata))
             self.maxyval = float(max(ydata))
+            if self.minyval * self.maxyval > 0 and self.minyval > 0:
+                self.minyval = 0.0
 
         self.yrange = self.maxyval - self.minyval
         if self.yrange == 0:
             self.yscale = 1.0
         else:
             self.yscale = 1 / self.yrange
+
+        # calculate area data
+        width = (self.surface.get_width()
+                 - self.options.padding.left - self.options.padding.right)
+        height = (self.surface.get_height()
+                  - self.options.padding.top - self.options.padding.bottom)
+
+        if self.minyval * self.maxyval < 0: # different signs
+            origin = abs(self.minyval) * self.yscale
+        else:
+            origin = 0
+
+        self.area = Area(self.options.padding.left,
+                         self.options.padding.top,
+                         width, height, origin)
 
     def _updateChart(self):
         raise NotImplementedError
@@ -214,13 +220,12 @@ class Chart(object):
         elif self.options.axis.x.tickCount > 0:
             uniqx = range(len(uniqueIndices(stores)) + 1)
             roughSeparation = self.xrange / self.options.axis.x.tickCount
-
             i = j = 0
-            while i + 1 < len(uniqx) and j < self.options.axis.x.tickCount:
-                if (uniqx[i + 1] - self.minxval) >= (j * roughSeparation):
+            while i  < len(uniqx) and j < self.options.axis.x.tickCount:
+                if (uniqx[i] - self.minxval) >= (j * roughSeparation):
                     pos = self.xscale * (uniqx[i] - self.minxval)
                     if 0.0 <= pos <= 1.0:
-                        self.xticks.append((pos, uniqx[i + 1]))
+                        self.xticks.append((pos, uniqx[i]))
                         j += 1
                 i += 1
 
@@ -237,6 +242,15 @@ class Chart(object):
                 pos = 1.0 - (self.yscale * (tick.v - self.minyval))
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, label))
+
+        elif self.options.axis.y.interval > 0:
+            interval = self.options.axis.y.interval
+            label = (divmod(self.minyval, interval)[0] + 1) * interval
+            pos = 1.0 - (self.yscale * (label - self.minyval))
+            while 0.0 <= pos <= 1.0:
+                self.yticks.append((pos, label))
+                label += interval
+                pos = 1.0 - (self.yscale * (label - self.minyval))
 
         elif self.options.axis.y.tickCount > 0:
             prec = self.options.axis.y.tickPrecision
@@ -262,11 +276,7 @@ class Chart(object):
 
         if self.options.background.baseColor:
             cx.set_source_rgb(*hex2rgb(self.options.background.baseColor))
-            x, y, w, h = 0, 0, self.area.w, self.area.h
-            w += self.options.padding.left + self.options.padding.right
-            h += self.options.padding.top + self.options.padding.bottom
-            cx.rectangle(x, y, w, h)
-            cx.fill()
+            cx.paint()
 
         if self.options.background.chartColor:
             cx.set_source_rgb(*hex2rgb(self.options.background.chartColor))
@@ -423,8 +433,10 @@ class Chart(object):
     def _renderXAxis(self, cx):
         """Draws the horizontal line representing the X axis"""
         cx.new_path()
-        cx.move_to(self.area.x, self.area.y + self.area.h)
-        cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
+        cx.move_to(self.area.x,
+                   self.area.y + self.area.h * (1.0 - self.area.origin))
+        cx.line_to(self.area.x + self.area.w,
+                   self.area.y + self.area.h * (1.0 - self.area.origin))
         cx.close_path()
         cx.stroke()
 
@@ -566,12 +578,13 @@ def uniqueIndices(arr):
 
 class Area(object):
     """Simple rectangle to hold an area coordinates and dimensions"""
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, origin=0.0):
         self.x, self.y, self.w, self.h = x, y, w, h
+        self.origin = origin
 
     def __str__(self):
-        return "<pycha.chart.Area@(%.2f, %.2f) %.2fx%.2f" % (self.x, self.y,
-                                                             self.w, self.h)
+        msg = "<pycha.chart.Area@(%.2f, %.2f) %.2f x %.2f Origin: %.2f>"
+        return  msg % (self.x, self.y, self.w, self.h, self.origin)
 
 class Option(dict):
     """Useful dict that allow attribute-like access to its keys"""
@@ -593,7 +606,7 @@ class Option(dict):
 DEFAULT_OPTIONS = Option(
     axis=Option(
         lineWidth=1.0,
-        lineColor='#000000',
+        lineColor='#0f0000',
         tickSize=3.0,
         labelColor='#666666',
         labelFont='Tahoma',
@@ -613,6 +626,7 @@ DEFAULT_OPTIONS = Option(
             ticks=None,
             tickCount=10,
             tickPrecision=1,
+            interval=0,
             range=None,
             rotate=None,
             label=None,
@@ -634,8 +648,8 @@ DEFAULT_OPTIONS = Option(
     padding=Option(
         left=30,
         right=30,
-        top=15,
-        bottom=15,
+        top=30,
+        bottom=30,
     ),
     stroke=Option(
         color='#ffffff',
@@ -646,8 +660,6 @@ DEFAULT_OPTIONS = Option(
     fillOpacity=1.0,
     shouldFill=True,
     barWidthFillFraction=0.75,
-    xOriginIsZero=True,
-    yOriginIsZero=True,
     pieRadius=0.4,
     colorScheme=DEFAULT_COLOR,
     title=None,
