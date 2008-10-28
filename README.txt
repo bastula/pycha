@@ -119,10 +119,11 @@ Now we are ready to instantiate the chart, add the data set and render it::
 
 Right now you can choose among 4 different kind of charts:
 
-    * Pie Charts (picha.pie.PieChart)
-    * Vertical Bar Charts (picha.bar.VerticalBarChart)
-    * Horizontal Bar Charts (picha.bar.HorizontalBarChart)
-    * Line Charts (picha.bar.LineChart) 
+    * Pie Charts (pycha.pie.PieChart)
+    * Vertical Bar Charts (pycha.bar.VerticalBarChart)
+    * Horizontal Bar Charts (pycha.bar.HorizontalBarChart)
+    * Line Charts (pycha.bar.LineChart)
+    * Scatterplot Charts (pycha.scatter.ScatterplotChart)
 
 Finally you can write the surface to a graphic file or anything you want using
 the cairo library::
