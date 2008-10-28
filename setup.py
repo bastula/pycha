@@ -42,4 +42,9 @@ setup(
 #        'pycairo',
 #    ],
     zip_safe=True,
+    entry_points = {
+        'gui_scripts': [
+            'chavier = chavier.app:main',
+        ]
+    }
 )

@@ -126,6 +126,10 @@ class App(object):
         chart.render()
         return chart
 
-if __name__ == '__main__':
+def main():
     app = App()
     app.run()
+    return 0
+    
+if __name__ == '__main__':
+    main()
