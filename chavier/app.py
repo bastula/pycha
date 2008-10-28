@@ -64,7 +64,6 @@ class App(object):
                 ticks=list,
                 tickCount=int,
                 tickPrecision=int,
-                interval=int,
                 range=list,
                 rotate=float,
                 label=unicode,

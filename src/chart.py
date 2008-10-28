@@ -243,15 +243,6 @@ class Chart(object):
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, label))
 
-        elif self.options.axis.y.interval > 0:
-            interval = self.options.axis.y.interval
-            label = (divmod(self.minyval, interval)[0] + 1) * interval
-            pos = 1.0 - (self.yscale * (label - self.minyval))
-            while 0.0 <= pos <= 1.0:
-                self.yticks.append((pos, label))
-                label += interval
-                pos = 1.0 - (self.yscale * (label - self.minyval))
-
         elif self.options.axis.y.tickCount > 0:
             prec = self.options.axis.y.tickPrecision
             num = self.yrange / self.options.axis.y.tickCount
@@ -626,7 +617,6 @@ DEFAULT_OPTIONS = Option(
             ticks=None,
             tickCount=10,
             tickPrecision=1,
-            interval=0,
             range=None,
             rotate=None,
             label=None,
