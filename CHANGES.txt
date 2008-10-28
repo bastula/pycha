@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.4.1 (unreleased)
+------------------
+- ...
+
 0.4.0 (2008-10-28)
 ------------------
 - Improved test suite (Lorenzo, Nicolas)
