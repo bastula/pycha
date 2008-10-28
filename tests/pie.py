@@ -119,9 +119,9 @@ class PieTests(unittest.TestCase):
         ch._updateXY()
         ch._updateChart()
         ch._updateTicks()
-        self.assertEqual(ch.xticks, [(0, '0 (10.0%)'),
-                                     (1, '1 (20.0%)'),
-                                     (2, '2 (70.0%)')])
+        self.assertEqual(ch.xticks, [('dataset1', 'dataset1 (10.0%)'),
+                                     ('dataset2', 'dataset2 (20.0%)'),
+                                     ('dataset3', 'dataset3 (70.0%)')])
         
 
 
