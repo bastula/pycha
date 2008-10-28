@@ -169,7 +169,7 @@ class VerticalBarTests(unittest.TestCase):
         for i in range(len(yticks)):
             self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
             self.assertAlmostEqual(ch.yticks[i][1], yticks[i][1], 4)
-            
+
     def test_udpateTicksWithNegatives(self):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
         dataset = (
@@ -243,7 +243,7 @@ class HorizontalBarTests(unittest.TestCase):
         dataset = (
             ('dataset1', ([0, -3], [1, -1], [2, 3], [3, 5])),
             )
- 
+
         ch = pycha.bar.HorizontalBarChart(surface)
         ch.addDataset(dataset)
         ch._updateXY()

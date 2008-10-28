@@ -86,7 +86,7 @@ class BarChart(Chart):
                 if self.options.shouldFill:
                     cx.set_source_rgb(*self.options.colorScheme[bar.name])
                     cx.fill_preserve()
-    
+
                 if not self.options.stroke.hide:
                     cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
                     cx.stroke()

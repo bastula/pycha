@@ -22,7 +22,7 @@ import cairo
 import pycha.chart
 
 class FunctionsTests(unittest.TestCase):
-    
+
     def test_uniqueIndices(self):
         arr = (range(10), range(5), range(20), range(30))
         self.assertEqual(pycha.chart.uniqueIndices(arr), range(30))
@@ -37,7 +37,7 @@ class FunctionsTests(unittest.TestCase):
         self.assertEqual(pycha.chart.uniqueIndices(arr), [])
 
 class AreaTests(unittest.TestCase):
-    
+
     def test_area(self):
         area = pycha.chart.Area(10, 20, 100, 300)
         self.assertEqual(area.x, 10)
@@ -49,7 +49,7 @@ class AreaTests(unittest.TestCase):
         self.assertEqual(str(area), msg)
 
 class OptionTests(unittest.TestCase):
-    
+
     def test_options(self):
         opt = pycha.chart.Option(a=1, b=2, c=3)
         self.assertEqual(opt.a, opt['a'])
@@ -69,13 +69,13 @@ class OptionTests(unittest.TestCase):
         self.assertEqual(opt.c.d, 7)
         # new attributes not present in original option are not merged
         self.assertRaises(AttributeError, getattr, opt.c, 'f')
-        
+
         opt.merge(pycha.chart.Option(a=10, b=20))
         self.assertEqual(opt.a, 10)
         self.assertEqual(opt.b, 20)
 
 class ChartTests(unittest.TestCase):
-    
+
     def test_init(self):
         ch = pycha.chart.Chart(None)
         self.assertEqual(ch.resetFlag, False)
@@ -92,7 +92,7 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.xticks, [])
         self.assertEqual(ch.yticks, [])
         self.assertEqual(ch.options, pycha.chart.DEFAULT_OPTIONS)
-    
+
     def test_datasets(self):
         ch = pycha.chart.Chart(None)
         d1 = ('dataset1', ([0,0], [1,2], [2,1.5]))
@@ -103,7 +103,7 @@ class ChartTests(unittest.TestCase):
                          ['dataset1', 'dataset2', 'dataset3'])
         self.assertEqual(ch._getDatasetsValues(),
                          [d1[1], d2[1], d3[1]])
-    
+
     def test_options(self):
         ch = pycha.chart.Chart(None)
         opt = pycha.chart.Option(shouldFill=False)
@@ -143,7 +143,7 @@ class ChartTests(unittest.TestCase):
 
         ch = pycha.chart.Chart(None, {'colorScheme': (0.0, 0.0, 0.0)})
         self.assertRaises(TypeError, ch._setColorscheme)
-    
+
     def test_updateXY(self):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
         opt = {'padding': dict(left=10, right=10, top=10, bottom=10)}
@@ -165,7 +165,6 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.maxyval, 4)
         self.assertEqual(ch.yrange, 4)
         self.assertEqual(ch.yscale, 1/4.0)
-        
         # TODO: test with different options (axis.range, ...)
 
     def test_updateTicks(self):
@@ -206,7 +205,7 @@ class ChartTests(unittest.TestCase):
         self.assertAlmostEqual(ch.yticks[0][0], 1.0, 4)
         self.assertAlmostEqual(ch.yticks[1][0], 2/3.0, 4)
         self.assertAlmostEqual(ch.yticks[2][0], 1/3.0, 4)
-        
+
     def test_abstractChart(self):
         ch = pycha.chart.Chart(None)
         self.assertRaises(NotImplementedError, ch._updateChart)

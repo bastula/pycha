@@ -22,7 +22,7 @@ import cairo
 import pycha.line
 
 class PointTests(unittest.TestCase):
-    
+
     def test_point(self):
         point = pycha.line.Point(2, 3, 1.0, 2.0, "test")
         self.assertEqual(point.x, 2)

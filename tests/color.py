@@ -86,7 +86,7 @@ class ColorTests(unittest.TestCase):
 
     def test_autoLighting(self):
         """This test ensures that the colors don't get to white too fast.
-        
+
         See bug #8.
         """
         # we have a lot of keys
@@ -94,13 +94,13 @@ class ColorTests(unittest.TestCase):
         keys = range(n)
         color = '#ff0000'
         scheme = pycha.color.generateColorscheme(color, keys)
-        
+
         # ensure that the last color is not completely white
         color = scheme[n-1]
         self.assertAlmostEqual(color[0], 1.0, 4) # the red component was already 1
         self.assertNotAlmostEqual(color[1], 1.0, 4)
         self.assertNotAlmostEqual(color[2], 1.0, 4)
-        
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(ColorTests),

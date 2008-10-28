@@ -27,7 +27,7 @@ from lines import lines
 def scatterplotChart(output):
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 200)
 
-    
+
     dataSet = (
         ('points', [(i, random.random() * 100.0) for i in range(100)]),
         )

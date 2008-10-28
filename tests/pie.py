@@ -122,7 +122,6 @@ class PieTests(unittest.TestCase):
         self.assertEqual(ch.xticks, [('dataset1', 'dataset1 (10.0%)'),
                                      ('dataset2', 'dataset2 (20.0%)'),
                                      ('dataset3', 'dataset3 (70.0%)')])
-        
 
 
 def test_suite():
