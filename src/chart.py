@@ -71,6 +71,11 @@ class Chart(object):
         """Sets options of this chart"""
         self.options.merge(options)
 
+    def getSurfaceSize(self):
+        cx = cairo.Context(self.surface)
+        x, y, w, h = cx.clip_extents()
+        return w, h
+
     def reset(self):
         """Resets options and datasets.
 
@@ -177,9 +182,10 @@ class Chart(object):
             self.yscale = 1 / self.yrange
 
         # calculate area data
-        width = (self.surface.get_width()
+        surface_width, surface_height = self.getSurfaceSize()
+        width = (surface_width
                  - self.options.padding.left - self.options.padding.right)
-        height = (self.surface.get_height()
+        height = (surface_height
                   - self.options.padding.top - self.options.padding.bottom)
 
         if self.minyval * self.maxyval < 0: # different signs
@@ -506,8 +512,7 @@ class Chart(object):
         if self.options.legend.hide:
             return
 
-        surfaceWidth = self.surface.get_width()
-        surfaceHeight = self.surface.get_height()
+        surface_width, surface_height = self.getSurfaceSize()
 
         # Compute legend dimensions
         padding = 4
@@ -524,11 +529,11 @@ class Chart(object):
         # Compute legend position
         legend = self.options.legend
         if legend.position.right is not None:
-            legend.position.left = (surfaceWidth
+            legend.position.left = (surface_width
                                     - legend.position.right
                                     - width)
         if legend.position.bottom is not None:
-            legend.position.top = (surfaceHeight
+            legend.position.top = (surface_height
                                    - legend.position.bottom
                                    - height)
 
