@@ -23,7 +23,7 @@ def read(*rnames):
 
 setup(
     name="pycha",
-    version="0.4.1dev",
+    version="0.4.2dev",
     author="Lorenzo Gil Sanchez",
     author_email="lorenzo.gil.sanchez@gmail.com",
     description="A library for making charts with Python",
