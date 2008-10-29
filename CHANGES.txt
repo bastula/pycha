@@ -3,7 +3,8 @@ Changes
 
 0.4.2dev (unreleased)
 ---------------------
-- ...
+- Support for SVG (and PDF, Postscript, Win32, Quartz) by changing the way
+  we compute the surface dimensions (Lorenzo)
 
 0.4.1 (2008-10-29)
 ------------------
