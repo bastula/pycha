@@ -75,7 +75,7 @@ Using pycha is quite simple. You always follow the same 5 simple steps:
       surface 
 
 To create the Cairo surface you just need to say the type of surface and its
-dimensions:
+dimensions::
 
    import cairo
    width, height = (500, 400)
