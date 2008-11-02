@@ -18,12 +18,14 @@
 import os
 from setuptools import setup
 
+from pycha import version
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 setup(
     name="pycha",
-    version="0.4.2dev",
+    version=version,
     author="Lorenzo Gil Sanchez",
     author_email="lorenzo.gil.sanchez@gmail.com",
     description="A library for making charts with Python",
