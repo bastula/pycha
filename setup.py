@@ -16,7 +16,6 @@
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-
 from setuptools import setup
 
 from pycha import version
