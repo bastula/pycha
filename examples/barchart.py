@@ -66,6 +66,9 @@ def barChart(output, chartFactory):
     surface.write_to_png(output)
 
 if __name__ == '__main__':
-    output = sys.argv[1] if len(sys.argv) > 1 else 'barchart.png'
+    if len(sys.argv) > 1:
+        output = sys.argv[1]
+    else:
+        output = 'barchart.png'
     barChart('v' + output, pycha.bar.VerticalBarChart)
     barChart('h' + output, pycha.bar.HorizontalBarChart)

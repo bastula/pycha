@@ -17,14 +17,14 @@
 
 import cairo
 
-import pycha.pie
-import pycha.bar
-import pycha.line
+from pycha.pie import PieChart
+from pycha.bar import VerticalBarChart
+from pycha.line import LineChart
 
 def testPie():
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
 
-    chart = pycha.pie.PieChart(surface)
+    chart = PieChart(surface)
     dataSet = (
         ('myFirstDataset', [[0, 3]]),
         ('mySecondDataset', [[0, 1.4]]),
@@ -48,7 +48,7 @@ def testBar():
             },
         }
 
-    chart = pycha.bar.VerticalBarChart(surface, options)
+    chart = VerticalBarChart(surface, options)
 
     dataSet = (
         ('myFirstDataset', [[0, 1], [1, 1], [2, 1.414], [3, 1.73]]),
@@ -65,7 +65,7 @@ def testBar():
 def testLine():
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 600, 500)
 
-    chart = pycha.line.LineChart(surface)
+    chart = LineChart(surface)
 
     dataSet = (
         ('myFirstDataset', [[0, 3], [1, 2], [2, 1.414], [3, 2.3]]),

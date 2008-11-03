@@ -22,8 +22,6 @@ import cairo
 
 import pycha.scatter
 
-from lines import lines
-
 def scatterplotChart(output):
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 200)
 
@@ -53,5 +51,8 @@ def scatterplotChart(output):
     surface.write_to_png(output)
 
 if __name__ == '__main__':
-    output = sys.argv[1] if len(sys.argv) > 1 else 'scatterchart.png'
+    if len(sys.argv) > 1:
+        output = sys.argv[1]
+    else:
+        output = 'scatterchart.png'
     scatterplotChart(output)
