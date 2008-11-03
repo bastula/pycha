@@ -18,21 +18,21 @@
 import cairo
 
 from pycha.chart import DEFAULT_OPTIONS
-import pycha.bar
-import pycha.line
-import pycha.pie
-import pycha.scatter
+from pycha.bar import HorizontalBarChart, VerticalBarChart
+from pycha.line import LineChart
+from pycha.pie import PieChart
+from pycha.scatter import ScatterplotChart
 
 from chavier.gui import GUI
 
 class App(object):
 
     CHART_TYPES = (
-        pycha.bar.VerticalBarChart,
-        pycha.bar.HorizontalBarChart,
-        pycha.line.LineChart,
-        pycha.pie.PieChart,
-        pycha.scatter.ScatterplotChart,
+        VerticalBarChart,
+        HorizontalBarChart,
+        LineChart,
+        PieChart,
+        ScatterplotChart,
         )
 
     (VERTICAL_BAR_TYPE,
@@ -130,6 +130,6 @@ def main():
     app = App()
     app.run()
     return 0
-    
+
 if __name__ == '__main__':
     main()
