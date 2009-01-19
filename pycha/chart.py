@@ -408,6 +408,7 @@ class Chart(object):
         cx.select_font_face(self.options.axis.labelFont,
                             cairo.FONT_SLANT_NORMAL,
                             cairo.FONT_WEIGHT_BOLD)
+        cx.set_font_size(self.options.axis.labelFontSize)
         labelWidth = cx.text_extents(label)[2]
         fontAscent = cx.font_extents()[0]
         if vertical:
