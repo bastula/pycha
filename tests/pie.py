@@ -119,9 +119,22 @@ class PieTests(unittest.TestCase):
         ch._updateXY()
         ch._updateChart()
         ch._updateTicks()
-        self.assertEqual(ch.xticks, [('dataset1', 'dataset1 (10.0%)'),
-                                     ('dataset2', 'dataset2 (20.0%)'),
-                                     ('dataset3', 'dataset3 (70.0%)')])
+        self.assertEqual(ch.xticks, [(0, 'dataset1 (10.0%)'),
+                                     (1, 'dataset2 (20.0%)'),
+                                     (2, 'dataset3 (70.0%)')])
+
+        ticks = [{'v': 0, 'label': 'First dataset'},
+                 {'v': 1, 'label': 'Second dataset'},
+                 {'v': 2, 'label': 'Third dataset'}]
+        opt = {'axis': {'x': {'ticks': ticks},},}
+        ch = pycha.pie.PieChart(surface, opt)
+        ch.addDataset(dataset)
+        ch._updateXY()
+        ch._updateChart()
+        ch._updateTicks()
+        self.assertEqual(ch.xticks, [(0, 'First dataset (10.0%)'),
+                                     (1, 'Second dataset (20.0%)'),
+                                     (2, 'Third dataset (70.0%)')])
 
 
 def test_suite():
