@@ -211,6 +211,21 @@ class ChartTests(unittest.TestCase):
         self.assertRaises(NotImplementedError, ch._updateChart)
         self.assertRaises(NotImplementedError, ch._renderChart, None)
 
+    def test_range(self):
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+        opt = {'axis': {'x': {'range': (1, 10)}, 'y': {'range': (1.0, 10.0)}}}
+        ch = pycha.chart.Chart(surface, opt)
+        dataset = (
+            ('dataset1', ([0, 1], [1, 1], [2, 3])),
+            )
+        ch.addDataset(dataset)
+        ch._updateXY()
+        self.assertAlmostEqual(ch.xrange, 9, 4)
+        self.assertAlmostEqual(ch.yrange, 9, 4)
+        self.assertAlmostEqual(ch.xscale, 0.1111, 4)
+        self.assertAlmostEqual(ch.yscale, 0.1111, 4)
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FunctionsTests),
@@ -218,6 +233,7 @@ def test_suite():
         unittest.makeSuite(OptionTests),
         unittest.makeSuite(ChartTests),
     ))
+
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
