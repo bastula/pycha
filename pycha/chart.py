@@ -162,7 +162,7 @@ class Chart(object):
         if self.xrange == 0:
             self.xscale = 1.0
         else:
-            self.xscale = 1 / self.xrange
+            self.xscale = 1.0 / self.xrange
 
         # gather data for the y axis
         if y_range_is_defined:
@@ -178,7 +178,7 @@ class Chart(object):
         if self.yrange == 0:
             self.yscale = 1.0
         else:
-            self.yscale = 1 / self.yrange
+            self.yscale = 1.0 / self.yrange
 
         # calculate area data
         surface_width, surface_height = self.getSurfaceSize()
