@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -17,6 +17,7 @@
 
 from pycha.chart import Chart
 from pycha.color import hex2rgb
+
 
 class LineChart(Chart):
 
@@ -40,6 +41,7 @@ class LineChart(Chart):
 
     def _renderChart(self, cx):
         """Renders a line chart"""
+
         def preparePath(storeName):
             cx.new_path()
             firstPoint = True
@@ -47,8 +49,8 @@ class LineChart(Chart):
             if self.options.shouldFill:
                 # Go to the (0,0) coordinate to start drawing the area
                 #cx.move_to(self.area.x, self.area.y + self.area.h)
-                cx.move_to(self.area.x,
-                           self.area.y + (1.0 - self.area.origin) * self.area.h)
+                offset = (1.0 - self.area.origin) * self.area.h
+                cx.move_to(self.area.x, self.area.y + offset)
 
             for point in self.points:
                 if point.name == storeName:
@@ -78,6 +80,7 @@ class LineChart(Chart):
         cx.save()
         cx.set_line_width(self.options.stroke.width)
         if self.options.shouldFill:
+
             def drawLine(storeName):
                 if self.options.stroke.shadow:
                     # draw shadow
@@ -108,7 +111,9 @@ class LineChart(Chart):
 
         cx.restore()
 
+
 class Point(object):
+
     def __init__(self, x, y, xval, yval, name):
         self.x, self.y = x, y
         self.xval, self.yval = xval, yval

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -17,6 +17,7 @@
 
 from pycha.chart import Chart, uniqueIndices
 from pycha.color import hex2rgb
+
 
 class BarChart(Chart):
 
@@ -96,6 +97,7 @@ class BarChart(Chart):
             drawBar(bar)
         cx.restore()
 
+
 class VerticalBarChart(BarChart):
 
     def _updateChart(self):
@@ -137,7 +139,7 @@ class HorizontalBarChart(BarChart):
             for item in store:
                 xval, yval = item
                 y = (((xval - self.minxval) * self.xscale)
-                     + self.barMargin  + (i * self.barWidthForSet))
+                     + self.barMargin + (i * self.barWidthForSet))
                 h = self.barWidthForSet
                 w = abs(yval) * self.yscale
                 if yval > 0:
@@ -154,7 +156,7 @@ class HorizontalBarChart(BarChart):
         super(BarChart, self)._updateTicks()
         offset = (self.minxdelta * self.xscale) / 2
         tmp = self.xticks
-        self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks ]
+        self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks]
         self.yticks = [(tick[0] + offset, tick[1]) for tick in tmp]
 
     def _renderLines(self, cx):
@@ -184,7 +186,9 @@ class HorizontalBarChart(BarChart):
         cx.close_path()
         cx.stroke()
 
+
 class Rect(object):
+
     def __init__(self, x, y, w, h, xval, yval, name):
         self.x, self.y, self.w, self.h = x, y, w, h
         self.xval, self.yval = xval, yval

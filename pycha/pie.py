@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -21,6 +21,7 @@ import cairo
 
 from pycha.chart import Chart, Option
 from pycha.color import hex2rgb
+
 
 class PieChart(Chart):
 
@@ -138,8 +139,9 @@ class PieChart(Chart):
 
             normalisedAngle = slice.getNormalisedAngle()
 
-            labelx = self.centerx + math.sin(normalisedAngle) * (self.radius + 10)
-            labely = self.centery - math.cos(normalisedAngle) * (self.radius + 10)
+            big_radius = self.radius + 10
+            labelx = self.centerx + math.sin(normalisedAngle) * big_radius
+            labely = self.centery - math.cos(normalisedAngle) * big_radius
 
             label = tick[1]
             extents = cx.text_extents(label)
@@ -167,6 +169,7 @@ class PieChart(Chart):
 
 
 class Slice(object):
+
     def __init__(self, name, fraction, xval, yval, angle):
         self.name = name
         self.fraction = fraction

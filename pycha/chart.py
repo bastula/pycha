@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -22,6 +22,7 @@ import cairo
 
 from pycha.color import (defaultColorscheme, getColorscheme, hex2rgb,
                          DEFAULT_COLOR)
+
 
 class Chart(object):
 
@@ -131,8 +132,6 @@ class Chart(object):
             self.resetFlag = False
             self.clean()
 
-
-    # update methods
     def _update(self, options={}):
         """Update all the information needed to render the chart"""
         self.setOptions(options)
@@ -153,7 +152,7 @@ class Chart(object):
         if x_range_is_defined:
             self.minxval, self.maxxval = self.options.axis.x.range
         else:
-            xdata = [pair[0] for pair in reduce(lambda a,b: a+b, stores)]
+            xdata = [pair[0] for pair in reduce(lambda a, b: a+b, stores)]
             self.minxval = float(min(xdata))
             self.maxxval = float(max(xdata))
             if self.minxval * self.maxxval > 0 and self.minxval > 0:
@@ -169,7 +168,7 @@ class Chart(object):
         if y_range_is_defined:
             self.minyval, self.maxyval = self.options.axis.y.range
         else:
-            ydata = [pair[1] for pair in reduce(lambda a,b: a+b, stores)]
+            ydata = [pair[1] for pair in reduce(lambda a, b: a+b, stores)]
             self.minyval = float(min(ydata))
             self.maxyval = float(max(ydata))
             if self.minyval * self.maxyval > 0 and self.minyval > 0:
@@ -227,7 +226,7 @@ class Chart(object):
             uniqx = range(len(uniqueIndices(stores)) + 1)
             roughSeparation = self.xrange / self.options.axis.x.tickCount
             i = j = 0
-            while i  < len(uniqx) and j < self.options.axis.x.tickCount:
+            while i < len(uniqx) and j < self.options.axis.x.tickCount:
                 if (uniqx[i] - self.minxval) >= (j * roughSeparation):
                     pos = self.xscale * (uniqx[i] - self.minxval)
                     if 0.0 <= pos <= 1.0:
@@ -263,7 +262,6 @@ class Chart(object):
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, round(yval, prec)))
 
-    # render methods
     def _renderBackground(self, cx):
         """Renders the background area of the chart"""
         if self.options.background.hide:
@@ -329,7 +327,7 @@ class Chart(object):
         cx.close_path()
         cx.stroke()
 
-        label =  unicode(tick[1])
+        label = unicode(tick[1])
         extents = cx.text_extents(label)
         labelWidth = extents[2]
         labelHeight = extents[3]
@@ -386,7 +384,8 @@ class Chart(object):
         return label
 
     def _getTickSize(self, cx, ticks, rotate):
-        tickExtents = [cx.text_extents(unicode(tick[1]))[2:4] for tick in ticks]
+        tickExtents = [cx.text_extents(unicode(tick[1]))[2:4]
+                       for tick in ticks]
         tickWidth = tickHeight = 0.0
         if tickExtents:
             tickHeight = self.options.axis.tickSize + 4.0
@@ -398,12 +397,13 @@ class Chart(object):
                 sinRadians = math.sin(radians)
                 cosRadians = math.cos(radians)
                 maxHeight = maxWidth * sinRadians + maxHeight * cosRadians
-                maxWidth =  maxWidth * cosRadians + maxHeight * sinRadians
+                maxWidth = maxWidth * cosRadians + maxHeight * sinRadians
             tickWidth += maxWidth
             tickHeight += maxHeight
         return tickWidth, tickHeight
 
-    def _renderAxisLabel(self, cx, tickWidth, tickHeight, label, x, y, vertical=False):
+    def _renderAxisLabel(self, cx, tickWidth, tickHeight, label, x, y,
+                         vertical=False):
         cx.new_path()
         cx.select_font_face(self.options.axis.labelFont,
                             cairo.FONT_SLANT_NORMAL,
@@ -569,12 +569,15 @@ class Chart(object):
 
         cx.restore()
 
+
 def uniqueIndices(arr):
     """Return a list with the indexes of the biggest element of arr"""
     return range(max([len(a) for a in arr]))
 
+
 class Area(object):
     """Simple rectangle to hold an area coordinates and dimensions"""
+
     def __init__(self, x, y, w, h, origin=0.0):
         self.x, self.y, self.w, self.h = x, y, w, h
         self.origin = origin
@@ -583,8 +586,10 @@ class Area(object):
         msg = "<pycha.chart.Area@(%.2f, %.2f) %.2f x %.2f Origin: %.2f>"
         return  msg % (self.x, self.y, self.w, self.h, self.origin)
 
+
 class Option(dict):
     """Useful dict that allow attribute-like access to its keys"""
+
     def __getattr__(self, name):
         if name in self.keys():
             return self[name]
@@ -594,11 +599,12 @@ class Option(dict):
     def merge(self, other):
         """Recursive merge with other Option or dict object"""
         for key, value in other.items():
-            if self.has_key(key):
+            if key in self:
                 if isinstance(self[key], Option):
                     self[key].merge(other[key])
                 else:
                     self[key] = other[key]
+
 
 DEFAULT_OPTIONS = Option(
     axis=Option(

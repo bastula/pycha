@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -17,6 +17,7 @@
 
 DEFAULT_COLOR = '#3c581a'
 
+
 def clamp(minValue, maxValue, value):
     """Make sure value is between minValue and maxValue"""
     if value < minValue:
@@ -24,6 +25,7 @@ def clamp(minValue, maxValue, value):
     if value > maxValue:
         return maxValue
     return value
+
 
 def hex2rgb(hexstring, digits=2):
     """Converts a hexstring color to a rgb tuple.
@@ -42,11 +44,13 @@ def hex2rgb(hexstring, digits=2):
     b = int(hexstring[digits*2+1:digits*3+1], 16)
     return r / top, g / top, b / top
 
+
 def lighten(r, g, b, amount):
     """Return a lighter version of the color (r, g, b)"""
     return (clamp(0.0, 1.0, r + amount),
             clamp(0.0, 1.0, g + amount),
             clamp(0.0, 1.0, b + amount))
+
 
 def generateColorscheme(masterColor, keys):
     """Generates a dictionary where the keys match the keys argument and
@@ -62,15 +66,18 @@ def generateColorscheme(masterColor, keys):
     return dict([(key, lighten(r, g, b, light * i))
                  for i, key in enumerate(keys)])
 
+
 def defaultColorscheme(keys):
     """Return the default color scheme (derived from a dark green)"""
     return generateColorscheme(DEFAULT_COLOR, keys)
+
 
 def getColorscheme(color, keys):
     """Get a color scheme from the six predefined ones or makes another
     one if the color is not found
     """
     return generateColorscheme(colorSchemes.get(color, color), keys)
+
 
 # default colors for color schemes
 colorSchemes = dict(
@@ -79,5 +86,5 @@ colorSchemes = dict(
     blue='#224565',
     grey='#444444',
     black='#000000',
-    darkcyan='#305755'
+    darkcyan='#305755',
     )
