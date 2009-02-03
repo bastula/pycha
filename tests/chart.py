@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -21,6 +21,7 @@ import cairo
 
 import pycha.chart
 
+
 class FunctionsTests(unittest.TestCase):
 
     def test_uniqueIndices(self):
@@ -30,11 +31,12 @@ class FunctionsTests(unittest.TestCase):
         arr = (range(30), range(20), range(5), range(10))
         self.assertEqual(pycha.chart.uniqueIndices(arr), range(30))
 
-        arr = (range(4),)
+        arr = (range(4), )
         self.assertEqual(pycha.chart.uniqueIndices(arr), range(4))
 
-        arr = (range(0),)
+        arr = (range(0), )
         self.assertEqual(pycha.chart.uniqueIndices(arr), [])
+
 
 class AreaTests(unittest.TestCase):
 
@@ -48,6 +50,7 @@ class AreaTests(unittest.TestCase):
         msg = "<pycha.chart.Area@(10.00, 20.00) 100.00 x 300.00 Origin: 0.00>"
         self.assertEqual(str(area), msg)
 
+
 class OptionTests(unittest.TestCase):
 
     def test_options(self):
@@ -56,7 +59,7 @@ class OptionTests(unittest.TestCase):
         self.assertEqual(opt.b, 2)
         self.assertEqual(opt['c'], 3)
 
-        opt = pycha.chart.Option({'a':1, 'b':2, 'c':3})
+        opt = pycha.chart.Option({'a': 1, 'b': 2, 'c': 3})
         self.assertEqual(opt.a, opt['a'])
         self.assertEqual(opt.b, 2)
         self.assertEqual(opt['c'], 3)
@@ -73,6 +76,7 @@ class OptionTests(unittest.TestCase):
         opt.merge(pycha.chart.Option(a=10, b=20))
         self.assertEqual(opt.a, 10)
         self.assertEqual(opt.b, 20)
+
 
 class ChartTests(unittest.TestCase):
 
@@ -95,9 +99,9 @@ class ChartTests(unittest.TestCase):
 
     def test_datasets(self):
         ch = pycha.chart.Chart(None)
-        d1 = ('dataset1', ([0,0], [1,2], [2,1.5]))
-        d2 = ('dataset2', ([0,1], [1,2], [2,2.4]))
-        d3 = ('dataset3', ([0,4], [1,3], [2,0.5]))
+        d1 = ('dataset1', ([0, 0], [1, 2], [2, 1.5]))
+        d2 = ('dataset2', ([0, 1], [1, 2], [2, 2.4]))
+        d3 = ('dataset3', ([0, 4], [1, 3], [2, 0.5]))
         ch.addDataset((d1, d2, d3))
         self.assertEqual(ch._getDatasetsKeys(),
                          ['dataset1', 'dataset2', 'dataset3'])
@@ -118,7 +122,7 @@ class ChartTests(unittest.TestCase):
         ch = pycha.chart.Chart(None, options={'shouldFill': False})
         self.assertEqual(ch.resetFlag, False)
         self.assertEqual(ch.options.shouldFill, False)
-        dataset = (('dataset1', ([0, 1], [1, 1])),)
+        dataset = (('dataset1', ([0, 1], [1, 1])), )
         ch.addDataset(dataset)
         self.assertEqual(ch._getDatasetsKeys(), ['dataset1'])
         ch.reset()
@@ -129,7 +133,7 @@ class ChartTests(unittest.TestCase):
 
     def test_colorscheme(self):
         ch = pycha.chart.Chart(None, {'colorScheme': '#000000'})
-        dataset = (('dataset1', ([0, 1], [1, 1])),)
+        dataset = (('dataset1', ([0, 1], [1, 1])), )
         ch.addDataset(dataset)
         ch._setColorscheme()
         self.assert_(isinstance(ch.options.colorScheme, dict))
@@ -155,7 +159,7 @@ class ChartTests(unittest.TestCase):
         ch.addDataset(dataset)
         ch._updateXY()
         self.assertEqual((ch.area.x, ch.area.y, ch.area.w, ch.area.h),
-                         (10,  10, 480, 480))
+                         (10, 10, 480, 480))
         self.assertEqual(ch.minxval, 0.0)
         self.assertEqual(ch.maxxval, 3)
         self.assertEqual(ch.xrange, 3)
@@ -237,4 +241,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-
