@@ -3,7 +3,6 @@ PyCha 0.4.1
 ***********
 
 :Author: Adam Przywecki <aprzywecki AT gmail.com>
-:Version: 0.0.1
 :Translations:
 
   * Chinese: Coming soon.
