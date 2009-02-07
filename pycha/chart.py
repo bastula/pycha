@@ -659,6 +659,12 @@ DEFAULT_OPTIONS = Option(
         shadow=True,
         width=2
     ),
+    yvals=Option(
+        show=False,
+        inside=False,
+        fontSize=11,
+        fontColor='#000000',
+    ),
     fillOpacity=1.0,
     shouldFill=True,
     barWidthFillFraction=0.75,

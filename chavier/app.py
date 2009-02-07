@@ -100,6 +100,12 @@ class App(object):
             shadow=bool,
             width=int,
             ),
+        yvals=dict(
+            show=bool,
+            inside=bool,
+            fontSize=int,
+            fontColor=str
+            ),
         fillOpacity=float,
         shouldFill=bool,
         barWidthFillFraction=float,

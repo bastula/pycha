@@ -92,10 +92,28 @@ class BarChart(Chart):
                     cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
                     cx.stroke()
 
+            # render yvals above/beside bars
+            if self.options.yvals.show:
+                cx.save()
+                cx.set_font_size(self.options.yvals.fontSize)
+                cx.set_source_rgb(*hex2rgb(self.options.yvals.fontColor))
+
+                label = unicode(bar.yval)
+                extents = cx.text_extents(label)
+                labelW = extents[2]
+                labelH = extents[3]
+
+                self._renderYVal(cx, label, labelW, labelH, x, y, w, h)
+
+                cx.restore()
+
         cx.save()
         for bar in self.bars:
             drawBar(bar)
         cx.restore()
+
+    def _renderYVal(self, cx, label, width, height, x, y, w, h):
+        raise NotImplementedError
 
 
 class VerticalBarChart(BarChart):
@@ -127,6 +145,20 @@ class VerticalBarChart(BarChart):
 
     def _getShadowRectangle(self, x, y, w, h):
         return (x-2, y-2, w+4, h+2)
+
+    def _renderYVal(self, cx, label, labelW, labelH, barX, barY, barW, barH):
+        x = barX + (barW / 2.0) - (labelW / 2.0)
+        if self.options.yvals.inside:
+            y = barY + (1.5 * labelH)
+        else:
+            y = barY - 0.5 * labelH
+
+        # if the label doesn't fit below the bar, put it above the bar
+        if y > (barY + barH):
+            y = barY - 0.5 * labelH
+
+        cx.move_to(x, y)
+        cx.show_text(label)
 
 
 class HorizontalBarChart(BarChart):
@@ -185,6 +217,20 @@ class HorizontalBarChart(BarChart):
                    self.area.y + self.area.h)
         cx.close_path()
         cx.stroke()
+
+    def _renderYVal(self, cx, label, labelW, labelH, barX, barY, barW, barH):
+        y = barY + (barH / 2.0) + (labelH / 2.0)
+        if self.options.yvals.inside:
+            x = barX + barW - (1.2 * labelW)
+        else:
+            x = barX + barW + 0.2 * labelW
+
+        # if the label doesn't fit to the left of the bar, put it to the right
+        if x < barX:
+            x = barX + barW + 0.2 * labelW
+
+        cx.move_to(x, y)
+        cx.show_text(label)
 
 
 class Rect(object):
