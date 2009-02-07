@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Chavier.
 #
@@ -21,10 +21,12 @@ import gtk
 
 from chavier.dialogs import (
     TextInputDialog, PointDialog, OptionDialog, RandomGeneratorDialog,
-    AboutDialog, warning
+    AboutDialog, warning,
     )
 
+
 class GUI(object):
+
     def __init__(self, app):
         self.app = app
 
@@ -80,8 +82,6 @@ class GUI(object):
 
         self.main_window.show()
 
-
-    # Internal methods
     def _create_ui_manager(self):
         self.uimanager = gtk.UIManager()
         accel_group = self.uimanager.get_accel_group()
@@ -272,7 +272,8 @@ class GUI(object):
             else:
                 if value is not None:
                     value = str(value)
-                self.options_store.append(parent_node, (name, value, value_type))
+                self.options_store.append(parent_node,
+                                          (name, value, value_type))
 
     def _get_current_dataset_tab(self):
         current_tab = self.datasets_notebook.get_current_page()
@@ -307,7 +308,7 @@ class GUI(object):
     def _get_options(self, iter):
         options = {}
         while iter is not None:
-            name, value, value_type  = self.options_store.get(iter, 0, 1, 2)
+            name, value, value_type = self.options_store.get(iter, 0, 1, 2)
             if value_type is None:
                 child = self.options_store.iter_children(iter)
                 options[name] = self._get_options(child)
@@ -353,7 +354,6 @@ class GUI(object):
             self.refresh()
         dialog.destroy()
 
-    # Event and signal handlers
     def delete_event(self, widget, event, data=None):
         return False
 
@@ -389,7 +389,6 @@ class GUI(object):
         iter = model.get_iter(path)
         self._edit_option_internal(model, iter)
 
-    # Action handlers
     def quit(self, action):
         self.main_window.destroy()
 
@@ -528,7 +527,6 @@ class GUI(object):
         dialog.run()
         dialog.destroy()
 
-    # Public API
     def run(self):
         gtk.main()
 
@@ -538,6 +536,7 @@ def str2bool(str):
         return True
     else:
         return False
+
 
 str_converters = {
     str: str,

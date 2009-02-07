@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Chavier.
 #
@@ -21,6 +21,7 @@ import webbrowser
 import pygtk
 pygtk.require('2.0')
 import gtk
+
 
 class TextInputDialog(gtk.Dialog):
 
@@ -54,6 +55,7 @@ class TextInputDialog(gtk.Dialog):
 
 
 class PointDialog(gtk.Dialog):
+
     def __init__(self, toplevel_window, initial_x, initial_y):
         flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -89,6 +91,7 @@ class PointDialog(gtk.Dialog):
 
 
 class OptionDialog(gtk.Dialog):
+
     def __init__(self, toplevel_window, label, value, value_type):
         flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -119,6 +122,7 @@ class OptionDialog(gtk.Dialog):
 
 
 class RandomGeneratorDialog(gtk.Dialog):
+
     def __init__(self, toplevel_window):
         flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -170,6 +174,7 @@ class RandomGeneratorDialog(gtk.Dialog):
 
 
 class AboutDialog(gtk.AboutDialog):
+
     def __init__(self, toplevel_window):
         super(AboutDialog, self).__init__()
         self.set_transient_for(toplevel_window)
@@ -179,7 +184,8 @@ class AboutDialog(gtk.AboutDialog):
         self.set_comments('A Chart Viewer for the Pycha library')
         self.set_copyright('Copyleft 2008 Lorenzo Gil Sanchez')
         #self.set_license('LGPL')
-        self.set_authors(['Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>'])
+        author = 'Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>'
+        self.set_authors([author])
         self.set_program_name('Chavier')
         self.set_website('http://www.lorenzogil.com/projects/pycha')
         self.set_website_label('Project website')

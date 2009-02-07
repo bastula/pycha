@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Chavier.
 #
@@ -24,6 +24,7 @@ from pycha.pie import PieChart
 from pycha.scatter import ScatterplotChart
 
 from chavier.gui import GUI
+
 
 class App(object):
 
@@ -125,6 +126,7 @@ class App(object):
         chart.addDataset(datasets)
         chart.render()
         return chart
+
 
 def main():
     app = App()
