@@ -45,25 +45,23 @@ Screenshots
 
 - **horizontal bar chart**
 
-.. image:: hbarchart.png
+.. image:: ../examples/hbarchart.png
 
 - **vertical bar chart**
 
-.. image:: vbarchart.png
+.. image:: ../examples/vbarchart.png
 
 - **pie chart**
 
-.. note:: Pie chart is currently broken.
-
-.. image:: piechart.png
+.. image:: ../examples/piechart.png
 
 - **line chart**
 
-.. image:: linechart.png
+.. image:: ../examples/linechart.png
 
 - **scatter chart**
 
-.. image:: scatterchart.png
+.. image:: ../examples/scatterchart.png
 
 .. index:: output formats
 .. _output-formats:
