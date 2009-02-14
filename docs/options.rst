@@ -275,7 +275,7 @@ Y-Axis Options
     ``string, default = None``
 
 Background Options
-^^^^^^^^^^^^^^^^^^
+------------------
 
 **hide**
     Toggles the visibility of the background.
@@ -301,5 +301,163 @@ Background Options
 **lineWidth**
     Sets the width of the chart line.
     
-    ``float, default = 1.5'``
+    ``float, default = 1.5``
+
+.. index:: legend options
+.. _legend-options:
+
+Legend Options
+--------------
+
+**opacity**
+    Sets the opacity of the legend. The value ranges from 0 to 1.0.
+    
+    ``float, default = 0.8``
+    
+**borderColor**
+    Sets the border color of the legend.
+    
+    ``hexadecimal color code, default = '#000000'``
+    
+**hide**
+    Toggles the visibility of the legend.
+    
+    ``boolean, default = False``
+    
+**position**
+    This option can be used to place the legend at a particular location on the
+    chart. The top, bottom, left, and right offsets can be adjusted.
+    
+    ``int, default = top: 20, left: 40, bottom: None, right: None``
+    
+.. index:: padding options
+.. _padding-options:
+
+Padding Options
+---------------
+
+**left**
+    Sets the left padding for the chart.
+    
+    ``int, default = 30``
+    
+**right**
+    Sets the right padding for the chart.
+    
+    ``int, default = 30``
+    
+**top**
+    Sets the top padding for the chart.
+    
+    ``int, default = 30``
+    
+**bottom**
+    Sets the bottom padding for the chart.
+    
+    ``int, default = 30``    
+
+.. index:: stroke options
+.. _stroke-options:
+
+Stroke Options
+--------------
+
+**color**
+    Sets the color of the bar outline stroke.
+    
+    ``hexadecimal color code, default = '#ffffff'``
+    
+**hide**
+    Toggles the visibility of the bar outline stroke.
+    
+    ``boolean, default = False``
+    
+**shadow**
+    Toggles the visibility of a shadow around each bar.
+    
+    ``boolean, default = True``
+    
+**width**
+    Sets the width of the bar outline stroke.
+    
+    ``int, default = 2``
+    
+.. index:: yval options
+.. _yval-options:
+
+Yval Options
+------------
+
+.. versionadded:: 0.4.3
+
+**show**
+    Toggles the visibility of y values above the bars.
+    
+    ``boolean, default = False``
+    
+**inside**
+    Toggles the placement of the y values. They are above the bars by default. If
+    a bar is too small to show its y value inside the bar, the value is drawn above
+    the bar.
+    
+    ``boolean, default = False``
+    
+**fontSize**
+    Sets the font size of the y values.
+    
+    ``int, default = 11``
+    
+**fontColor**
+    Sets the color of the font of the y values.
+    
+    ``hexadecimal color code, default = '#000000'``
+    
+.. index:: miscellaneous options
+.. _misc-options:
+
+Miscellaneous Options
+---------------------
+
+**fillOpacity**
+    Sets the opacity of the bars.
+    
+    ``float, default = 1.0``
+    
+**shouldFill**
+    Toggles whether the bars should be filled.
+    
+    ``boolean, default = True``
+    
+**barWidthFillFraction**
+    Sets the fraction of the width that will be used to draw the bar. For example,
+    a fraction of 1.0 will use the whole width to draw the bars (the bars will touch).
+    
+    ``float, default = 0.75``
+    
+**pieRadius**
+    Sets the radius of the pie chart. This option is ignored for other charts.
+    
+    ``float, default = 0.4``
+    
+**colorScheme**
+    Sets the color scheme of the chart. Available schemes include    
+    red, green, blue, grey, black, and darkcyan. DEFAULT_COLOR is
+    '#3c581a' (green).
+    
+    ``hexadecimal color code, default = DEFAULT_COLOR``    
+        
+**title**
+    Sets the title of the chart.
+    
+    ``string, default = None``
+    
+**titleFont**
+    Sets the font of the chart title.
+    
+    ``font name, default = 'Tahoma'``
+    
+**titleFontSize**
+    Sets the size of the chart title font.
+    
+    ``int, default = 12``
 
