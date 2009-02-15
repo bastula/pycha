@@ -1,5 +1,5 @@
 ***********
-PyCha 0.4.1
+PyCha 0.4.2
 ***********
 
 :Author: Adam Przywecki <aprzywecki AT gmail.com>
