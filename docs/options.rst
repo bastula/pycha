@@ -388,7 +388,7 @@ Stroke Options
 Yval Options
 ------------
 
-.. versionadded:: 0.4.3
+.. versionadded:: 0.4.2
 
 **show**
     Toggles the visibility of y values above the bars.
