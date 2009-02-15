@@ -1,8 +1,14 @@
 Changes
 =======
 
-0.4.2dev (unreleased)
----------------------
+0.4.2 (2009-02-15)
+------------------
+- Much better documentation (Adam)
+- Fixes integer division when computing xscale (Laurent)
+- Fix for a broken example (Lorenzo)
+- Use labelFontSize when rendering the axis (Adam Przywecki)
+- Code cleanups. Now it should pass pyflakes and pep8 in most files (Lorenzo)
+- Support for running the test suite with python setup.py test (Lorenzo)
 - Support for SVG (and PDF, Postscript, Win32, Quartz) by changing the way
   we compute the surface dimensions (Lorenzo)
 
