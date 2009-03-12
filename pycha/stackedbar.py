@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
-from pycha.bar import BarChart, VerticalBarChart
+from pycha.bar import BarChart, VerticalBarChart, HorizontalBarChart, Rect
 from pycha.chart import uniqueIndices
-from pycha.color import hex2rgb
 
 
 class StackedBarChart(BarChart):
@@ -80,7 +79,7 @@ class StackedVerticalBarChart(StackedBarChart, VerticalBarChart):
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
-                x = (xval - self.minxval) * self.xscale + self.barMargin
+                x = ((xval - self.minxval) * self.xscale) + self.barMargin
                 w = self.barWidth
                 h = abs(yval) * self.yscale
                 if yval > 0:
@@ -98,86 +97,29 @@ class StackedVerticalBarChart(StackedBarChart, VerticalBarChart):
                     self.bars.append(rect)
 
 
-class StackedHorizontalBarChart(StackedBarChart):
+class StackedHorizontalBarChart(StackedBarChart, HorizontalBarChart):
 
     def _updateChart(self):
         """Evaluates measures for horizontal bars"""
         super(StackedHorizontalBarChart, self)._updateChart()
 
+        accumulated_widths = {}
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 xval, yval = item
-                y = (((xval - self.minxval) * self.xscale)
-                     + self.barMargin + (i * self.barWidth))
+                y = ((xval - self.minxval) * self.xscale) + self.barMargin
                 h = self.barWidth
                 w = abs(yval) * self.yscale
                 if yval > 0:
                     x = self.area.origin
                 else:
                     x = self.area.origin - w
+
+                accumulated_width = accumulated_widths.setdefault(xval, 0)
+                x += accumulated_width
+                accumulated_widths[xval] += w
+
                 rect = Rect(x, y, w, h, xval, yval, name)
 
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
-
-    def _updateTicks(self):
-        """Evaluates bar ticks"""
-        super(StackedBarChart, self)._updateTicks()
-        offset = (self.minxdelta * self.xscale) / 2
-        tmp = self.xticks
-        self.xticks = [(1.0 - tick[0], tick[1]) for tick in self.yticks]
-        self.yticks = [(tick[0] + offset, tick[1]) for tick in tmp]
-
-    def _renderLines(self, cx):
-        """Aux function for _renderBackground"""
-        ticks = self.xticks
-        for tick in ticks:
-            self._renderLine(cx, tick, True)
-
-    def _getShadowRectangle(self, x, y, w, h):
-        return (x, y-2, w+2, h+4)
-
-    def _renderXAxis(self, cx):
-        """Draws the horizontal line representing the X axis"""
-        cx.new_path()
-        cx.move_to(self.area.x, self.area.y + self.area.h)
-        cx.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
-        cx.close_path()
-        cx.stroke()
-
-    def _renderYAxis(self, cx):
-        # draws the vertical line representing the Y axis
-        cx.new_path()
-        cx.move_to(self.area.x + self.area.origin * self.area.w,
-                   self.area.y)
-        cx.line_to(self.area.x + self.area.origin * self.area.w,
-                   self.area.y + self.area.h)
-        cx.close_path()
-        cx.stroke()
-
-    def _renderYVal(self, cx, label, labelW, labelH, barX, barY, barW, barH):
-        y = barY + (barH / 2.0) + (labelH / 2.0)
-        if self.options.yvals.inside:
-            x = barX + barW - (1.2 * labelW)
-        else:
-            x = barX + barW + 0.2 * labelW
-
-        # if the label doesn't fit to the left of the bar, put it to the right
-        if x < barX:
-            x = barX + barW + 0.2 * labelW
-
-        cx.move_to(x, y)
-        cx.show_text(label)
-
-
-class Rect(object):
-
-    def __init__(self, x, y, w, h, xval, yval, name):
-        self.x, self.y, self.w, self.h = x, y, w, h
-        self.xval, self.yval = xval, yval
-        self.name = name
-
-    def __str__(self):
-        return ("<pycha.bar.Rect@(%.2f, %.2f) %.2fx%.2f (%.2f, %.2f) %s>"
-                % (self.x, self.y, self.w, self.h, self.xval, self.yval,
-                   self.name))
