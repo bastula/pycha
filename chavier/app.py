@@ -22,6 +22,7 @@ from pycha.bar import HorizontalBarChart, VerticalBarChart
 from pycha.line import LineChart
 from pycha.pie import PieChart
 from pycha.scatter import ScatterplotChart
+from pycha.stackedbar import StackedVerticalBarChart, StackedHorizontalBarChart
 
 from chavier.gui import GUI
 
@@ -34,13 +35,17 @@ class App(object):
         LineChart,
         PieChart,
         ScatterplotChart,
+        StackedVerticalBarChart,
+        StackedHorizontalBarChart,
         )
 
     (VERTICAL_BAR_TYPE,
      HORIZONTAL_BAR_TYPE,
      LINE_TYPE,
      PIE_TYPE,
-     SCATTER_TYPE) = range(len(CHART_TYPES))
+     SCATTER_TYPE,
+     STACKED_VERTICAL_BAR_TYPE,
+     STACKED_HORIZONTAL_BAR_TYPE) = range(len(CHART_TYPES))
 
     OPTIONS_TYPES = dict(
         axis=dict(

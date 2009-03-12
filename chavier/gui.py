@@ -141,6 +141,12 @@ class GUI(object):
                  'Use pie chart', self.app.PIE_TYPE),
                 ('scatter', None, '_Scatter', None,
                  'Use scatter chart', self.app.SCATTER_TYPE),
+                ('stackedverticalbar', None, '_Stacked Vertical bars', None,
+                 'Use stacked vertical bars chart',
+                 self.app.STACKED_VERTICAL_BAR_TYPE),
+                ('stackedhorizontalbar', None, '_Stacked Horizontal bars', None,
+                 'Use stacked horizontal bars chart',
+                 self.app.STACKED_HORIZONTAL_BAR_TYPE),
                 ], self.app.VERTICAL_BAR_TYPE, self.on_chart_type_change)
         self.uimanager.insert_action_group(action_group, -1)
 
@@ -165,6 +171,8 @@ class GUI(object):
       <separator />
       <menuitem action="verticalbar"/>
       <menuitem action="horizontalbar"/>
+      <menuitem action="stackedverticalbar"/>
+      <menuitem action="stackedhorizontalbar"/>
       <menuitem action="line"/>
       <menuitem action="pie"/>
       <menuitem action="scatter"/>
