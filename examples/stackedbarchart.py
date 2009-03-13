@@ -59,4 +59,4 @@ if __name__ == '__main__':
     else:
         output = 'stackedbarchart.png'
     stackedBarChart('v' + output, pycha.stackedbar.StackedVerticalBarChart)
-#    stackedBarChart('h' + output, pycha.stackedbar.StackedHorizontalBarChart)
+    stackedBarChart('h' + output, pycha.stackedbar.StackedHorizontalBarChart)
