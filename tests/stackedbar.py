@@ -58,7 +58,7 @@ class StackedBarTests(unittest.TestCase):
         self.assertAlmostEqual(ch.barMargin, 0.0625, 4)
 
 
-class VerticalBarTests(unittest.TestCase):
+class StackedVerticalBarTests(unittest.TestCase):
 
     def test_updateChart(self):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
@@ -66,7 +66,7 @@ class VerticalBarTests(unittest.TestCase):
             ('dataset1', ([0, 3], [1, 4], [2, 2], [3, 5], [4, 3.5])),
             ('dataset2', ([0, 2], [1, 3], [2, 1], [3, 5], [4, 2.5])),
             )
-        ch = pycha.bar.VerticalBarChart(surface)
+        ch = pycha.stackedbar.StackedVerticalBarChart(surface)
         ch.addDataset(dataset)
         ch._updateXY()
         ch._updateChart()
@@ -76,65 +76,25 @@ class VerticalBarTests(unittest.TestCase):
         self.assertAlmostEqual(ch.xscale, 0.20, 4)
         self.assertEqual(ch.minyval, 0)
         self.assertEqual(ch.maxyval, 5)
-        self.assertEqual(ch.yrange, 5)
-        self.assertAlmostEqual(ch.yscale, 0.20, 4)
+        self.assertEqual(ch.yrange, 10)
+        self.assertAlmostEqual(ch.yscale, 0.10, 4)
         self.assertEqual(ch.minxdelta, 1)
-        self.assertAlmostEqual(ch.barWidthForSet, 0.075, 4)
+        self.assertAlmostEqual(ch.barWidth, 0.150, 4)
         self.assertAlmostEqual(ch.barMargin, 0.025, 4)
 
         R = pycha.bar.Rect
         bars = (
-            R(0.025, 0.400, 0.075, 0.600, 0, 3, 'dataset1'),
-            R(0.225, 0.200, 0.075, 0.800, 1, 4, 'dataset1'),
-            R(0.425, 0.600, 0.075, 0.400, 2, 2, 'dataset1'),
-            R(0.625, 0.000, 0.075, 1.000, 3, 5, 'dataset1'),
-            R(0.825, 0.300, 0.075, 0.700, 4, 3.5, 'dataset1'),
+            R(0.025, 0.700, 0.150, 0.300, 0, 3, 'dataset1'),
+            R(0.225, 0.600, 0.150, 0.400, 1, 4, 'dataset1'),
+            R(0.425, 0.800, 0.150, 0.200, 2, 2, 'dataset1'),
+            R(0.625, 0.500, 0.150, 0.500, 3, 5, 'dataset1'),
+            R(0.825, 0.650, 0.150, 0.350, 4, 3.5, 'dataset1'),
 
-            R(0.100, 0.600, 0.075, 0.400, 0, 2, 'dataset2'),
-            R(0.300, 0.400, 0.075, 0.600, 1, 3, 'dataset2'),
-            R(0.500, 0.800, 0.075, 0.200, 2, 1, 'dataset2'),
-            R(0.700, 0.000, 0.075, 1.000, 3, 5, 'dataset2'),
-            R(0.900, 0.500, 0.075, 0.500, 4, 2.5, 'dataset2'),
-            )
-
-        for i, bar in enumerate(bars):
-            b1, b2 = ch.bars[i], bar
-            self.assertAlmostEqual(b1.x, b2.x, 4)
-            self.assertAlmostEqual(b1.y, b2.y, 4)
-            self.assertAlmostEqual(b1.w, b2.w, 4)
-            self.assertAlmostEqual(b1.h, b2.h, 4)
-            self.assertEqual(b1.xval, b2.xval)
-            self.assertEqual(b1.yval, b2.yval)
-            self.assertEqual(b1.name, b2.name)
-
-    def test_updateChartWithNegatives(self):
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
-        dataset = (
-            ('dataset1', ([0, -3], [1, -1], [2, 3], [3, 5])),
-            )
-        ch = pycha.bar.VerticalBarChart(surface)
-        ch.addDataset(dataset)
-        ch._updateXY()
-        ch._updateChart()
-        self.assertEqual(ch.minxval, 0)
-        self.assertEqual(ch.maxxval, 3)
-        self.assertEqual(ch.xrange, 3)
-        self.assertAlmostEqual(ch.xscale, 0.25, 4)
-        self.assertEqual(ch.minyval, -3)
-        self.assertEqual(ch.maxyval, 5)
-        self.assertEqual(ch.yrange, 8)
-        self.assertAlmostEqual(ch.yscale, 0.125, 4)
-        self.assertAlmostEqual(ch.area.origin, 0.375)
-        self.assertEqual(ch.minxdelta, 1)
-        self.assertAlmostEqual(ch.barWidthForSet, 0.1875, 4)
-        self.assertAlmostEqual(ch.barMargin, 0.03125, 4)
-
-        R = pycha.bar.Rect
-        bars = (
-            R(0.03125, 0.625, 0.1875, 0.375, 0, -3, 'dataset1'),
-            R(0.28125, 0.625, 0.1875, 0.125, 1, -1, 'dataset1'),
-            R(0.53125, 0.250, 0.1875, 0.375, 2,  3, 'dataset1'),
-            R(0.78125, 0.000, 0.1875, 0.625, 3,  5, 'dataset1'),
+            R(0.025, 0.500, 0.150, 0.200, 0, 2, 'dataset2'),
+            R(0.225, 0.300, 0.150, 0.300, 1, 3, 'dataset2'),
+            R(0.425, 0.700, 0.150, 0.100, 2, 1, 'dataset2'),
+            R(0.625, 0.000, 0.150, 0.500, 3, 5, 'dataset2'),
+            R(0.825, 0.400, 0.150, 0.250, 4, 2.5, 'dataset2'),
             )
 
         for i, bar in enumerate(bars):
@@ -153,7 +113,7 @@ class VerticalBarTests(unittest.TestCase):
             ('dataset1', ([0, 1], [1, 1], [2, 3])),
             ('dataset2', ([0, 2], [1, 0], [3, 4])),
             )
-        ch = pycha.bar.VerticalBarChart(surface)
+        ch = pycha.stackedbar.StackedVerticalBarChart(surface)
         ch.addDataset(dataset)
         ch._updateXY()
         ch._updateChart()
@@ -164,42 +124,12 @@ class VerticalBarTests(unittest.TestCase):
             self.assertAlmostEqual(ch.xticks[i][1], xticks[i][1], 4)
 
         yticks = [
-            (1.0, 0.0), (0.9, 0.4), (0.8, 0.8), (0.7, 1.2), (0.6, 1.6),
-            (0.5, 2.0), (0.4, 2.4), (0.3, 2.8), (0.2, 3.2), (0.1, 3.6),
-            (0.0, 4.0)
+            (1.0, 0.0), (0.9, 0.7), (0.8, 1.4), (0.7, 2.1), (0.6, 2.8),
+            (0.5, 3.5), (0.4, 4.2), (0.3, 4.9),
             ]
         for i in range(len(yticks)):
             self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
             self.assertAlmostEqual(ch.yticks[i][1], yticks[i][1], 4)
-
-    def test_udpateTicksWithNegatives(self):
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
-        dataset = (
-            ('dataset1', ([0, -2], [1, 1], [2, 3])),
-            )
-        ch = pycha.bar.VerticalBarChart(surface)
-        ch.addDataset(dataset)
-        ch._updateXY()
-        ch._updateChart()
-        ch._updateTicks()
-        xticks = [(0.1667, 0), (0.5000, 1), (0.8333, 2)]
-        for i in range(len(xticks)):
-            self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
-            self.assertAlmostEqual(ch.xticks[i][1], xticks[i][1], 4)
-
-        yticks = [
-            (1.0, -2.0), (0.9, -1.5), (0.8, -1.0), (0.7, -0.5), (0.6, 0.0),
-            (0.5, 0.5), (0.4, 1.0), (0.3, 1.5), (0.2, 2.0), (0.1, 2.5),
-            (0.0, 3.0)
-            ]
-        for i in range(len(yticks)):
-            self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
-            self.assertAlmostEqual(ch.yticks[i][1], yticks[i][1], 4)
-
-    def test_shadowRectangle(self):
-        ch = pycha.bar.VerticalBarChart(None)
-        shadow = ch._getShadowRectangle(10, 20, 400, 300)
-        self.assertEqual(shadow, (8, 18, 404, 302))
 
 
 class HorizontalBarTests(unittest.TestCase):
@@ -297,7 +227,7 @@ class HorizontalBarTests(unittest.TestCase):
         xticks = [
             (0.0, 0.0), (0.1, 0.4), (0.2, 0.8), (0.3, 1.2), (0.4, 1.6),
             (0.5, 2.0), (0.6, 2.4), (0.7, 2.8), (0.8, 3.2), (0.9, 3.6),
-            (1.0, 4.0)
+            (1.0, 4.0),
             ]
         for i in range(len(xticks)):
             self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
@@ -321,7 +251,7 @@ class HorizontalBarTests(unittest.TestCase):
         xticks = [
             (0.0, -2.0), (0.1, -1.5), (0.2, -1.0), (0.3, -0.5), (0.4, 0.0),
             (0.5, 0.5), (0.6, 1.0), (0.7, 1.5), (0.8, 2.0), (0.9, 2.5),
-            (1.0, 3.0)
+            (1.0, 3.0),
             ]
         for i in range(len(xticks)):
             self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
@@ -341,10 +271,9 @@ class HorizontalBarTests(unittest.TestCase):
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(StackedBarTests),
-        unittest.makeSuite(VerticalBarTests),
+        unittest.makeSuite(StackedVerticalBarTests),
         unittest.makeSuite(HorizontalBarTests),
     ))
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-
