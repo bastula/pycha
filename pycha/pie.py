@@ -111,7 +111,7 @@ class PieChart(Chart):
         cx.save()
         for slice in self.slices:
             if slice.isBigEnough():
-                cx.set_source_rgb(*self.options.colorScheme[slice.name])
+                cx.set_source_rgb(*self.colorScheme[slice.name])
                 if self.options.shouldFill:
                     slice.draw(cx, self.centerx, self.centery, self.radius)
                     cx.fill()

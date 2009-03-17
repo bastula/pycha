@@ -1,4 +1,5 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+#              2009 by Yaco S.L. <lgs@yaco.es>
 #
 # This file is part of PyCha.
 #
@@ -18,6 +19,11 @@
 import unittest
 
 import pycha.color
+
+
+class SimpleColorScheme(pycha.color.ColorScheme):
+    pass
+
 
 class ColorTests(unittest.TestCase):
 
@@ -62,27 +68,25 @@ class ColorTests(unittest.TestCase):
         for i in range(3):
             self.assertAlmostEqual(c1[i], c2[i], precission)
 
-    def test_generateColorscheme(self):
-        keys = ('k1', 'k2', 'k3', 'k4')
-        color = '#ff0000'
-        scheme = pycha.color.generateColorscheme(color, keys)
-
-        self._assertColors(scheme['k1'], (1, 0, 0), 3)
-        self._assertColors(scheme['k2'], (1, 0.125, 0.125), 3)
-        self._assertColors(scheme['k3'], (1, 0.250, 0.250), 3)
-        self._assertColors(scheme['k4'], (1, 0.375, 0.375), 3)
-
-    def test_defaultColorScheme(self):
-        keys = ('k1', 'k2', 'k3', 'k4')
-        scheme1 = pycha.color.defaultColorscheme(keys)
-        color = pycha.color.DEFAULT_COLOR
-        scheme2 = pycha.color.generateColorscheme(color, keys)
-        self.assertEqual(scheme1, scheme2)
-
-    def test_colorScheme(self):
+    def test_basicColors(self):
         colors = ('red', 'green', 'blue', 'grey', 'black', 'darkcyan')
         for color in colors:
-            self.assert_(pycha.color.colorSchemes.has_key(color))
+            self.assert_(color in pycha.color.basicColors)
+
+    def test_ColorSchemeRegistry(self):
+        self.assertEquals(SimpleColorScheme,
+                          pycha.color.ColorScheme.getColorScheme('simple'))
+        self.assertEquals(None,
+                          pycha.color.ColorScheme.getColorScheme('foo'))
+
+    def test_GradientColorScheme(self):
+        keys = range(5)
+        scheme = pycha.color.GradientColorScheme(keys, "000000")
+        self._assertColors(scheme[0], (0.0, 0.0, 0.0), 3)
+        self._assertColors(scheme[1], (0.1, 0.1, 0.1), 3)
+        self._assertColors(scheme[2], (0.2, 0.2, 0.2), 3)
+        self._assertColors(scheme[3], (0.3, 0.3, 0.3), 3)
+        self._assertColors(scheme[4], (0.4, 0.4, 0.4), 3)
 
     def test_autoLighting(self):
         """This test ensures that the colors don't get to white too fast.
@@ -93,18 +97,22 @@ class ColorTests(unittest.TestCase):
         n = 50
         keys = range(n)
         color = '#ff0000'
-        scheme = pycha.color.generateColorscheme(color, keys)
+        scheme = pycha.color.GradientColorScheme(keys, color)
 
         # ensure that the last color is not completely white
         color = scheme[n-1]
-        self.assertAlmostEqual(color[0], 1.0, 4) # the red component was already 1
+
+        # the red component was already 1
+        self.assertAlmostEqual(color[0], 1.0, 4)
         self.assertNotAlmostEqual(color[1], 1.0, 4)
         self.assertNotAlmostEqual(color[2], 1.0, 4)
+
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(ColorTests),
     ))
+
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')

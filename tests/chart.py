@@ -132,21 +132,19 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(ch.resetFlag, True)
 
     def test_colorscheme(self):
-        ch = pycha.chart.Chart(None, {'colorScheme': '#000000'})
+        options = {'colorScheme': {'name': 'gradient',
+                                   'args': {'initialColor': '#000000'}}}
+        ch = pycha.chart.Chart(None, options)
         dataset = (('dataset1', ([0, 1], [1, 1])), )
         ch.addDataset(dataset)
         ch._setColorscheme()
-        self.assert_(isinstance(ch.options.colorScheme, dict))
-        self.assertEqual(ch.options.colorScheme, {'dataset1': (0.0, 0.0, 0.0)})
+        self.assert_(isinstance(ch.colorScheme, dict))
+        self.assertEqual(ch.colorScheme, {'dataset1': (0.0, 0.0, 0.0)})
 
-        ch = pycha.chart.Chart(None, {'colorScheme': {}})
+        options = {'colorScheme': {'name': 'foo'}}
+        ch = pycha.chart.Chart(None, options)
         ch.addDataset(dataset)
-        ch._setColorscheme()
-        self.assert_(isinstance(ch.options.colorScheme, dict))
-        self.assertEqual(ch.options.colorScheme.keys(), ['dataset1'])
-
-        ch = pycha.chart.Chart(None, {'colorScheme': (0.0, 0.0, 0.0)})
-        self.assertRaises(TypeError, ch._setColorscheme)
+        self.assertRaises(ValueError, ch._setColorscheme)
 
     def test_updateXY(self):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)

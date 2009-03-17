@@ -35,7 +35,12 @@ def scatterplotChart(output):
             'color': '#eeeeff',
             'lineColor': '#444444'
         },
-        'colorScheme': 'blue',
+        'colorScheme': {
+            'name': 'gradient',
+            'args': {
+                'initialColor': 'blue',
+            },
+        },
         'legend': {
             'hide': True,
         },

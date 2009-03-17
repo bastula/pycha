@@ -20,8 +20,7 @@ import math
 
 import cairo
 
-from pycha.color import (defaultColorscheme, getColorscheme, hex2rgb,
-                         DEFAULT_COLOR)
+from pycha.color import ColorScheme, hex2rgb, DEFAULT_COLOR
 
 
 class Chart(object):
@@ -55,6 +54,8 @@ class Chart(object):
 
         # initialize the surface
         self._initSurface(surface)
+
+        self.colorScheme = None
 
     def addDataset(self, dataset):
         """Adds an object containing chart data to the storage hash"""
@@ -112,18 +113,17 @@ class Chart(object):
         cx.restore()
 
     def _setColorscheme(self):
-        """Sets the colorScheme used for the chart using the color in the
+        """Sets the colorScheme used for the chart using the
         options.colorScheme option
         """
-        scheme = self.options.colorScheme
+        name = self.options.colorScheme.name
         keys = self._getDatasetsKeys()
-        if isinstance(scheme, dict):
-            if not scheme:
-                self.options.colorScheme = defaultColorscheme(keys)
-        elif isinstance(scheme, basestring):
-            self.options.colorScheme = getColorscheme(scheme, keys)
-        else:
-            raise TypeError("Color scheme is invalid!")
+        colorSchemeClass = ColorScheme.getColorScheme(name, None)
+        if colorSchemeClass is None:
+            raise ValueError('Color scheme is invalid!')
+
+        kwargs = dict(self.options.colorScheme.args)
+        self.colorScheme = colorSchemeClass(keys, **kwargs)
 
     def _initSurface(self, surface):
         self.surface = surface
@@ -551,7 +551,7 @@ class Chart(object):
 
         def drawKey(key, x, y, text_height):
             cx.rectangle(x, y, bullet, bullet)
-            cx.set_source_rgb(*self.options.colorScheme[key])
+            cx.set_source_rgb(*self.colorScheme[key])
             cx.fill_preserve()
             cx.set_source_rgb(0, 0, 0)
             cx.stroke()
@@ -669,7 +669,10 @@ DEFAULT_OPTIONS = Option(
     shouldFill=True,
     barWidthFillFraction=0.75,
     pieRadius=0.4,
-    colorScheme=DEFAULT_COLOR,
+    colorScheme=Option(
+        name='gradient',
+        args=Option(initialColor=DEFAULT_COLOR),
+    ),
     title=None,
     titleFont='Tahoma',
     titleFontSize=12,

@@ -48,7 +48,12 @@ def barChart(output, chartFactory):
             'baseColor': '#ffffff',
             'lineColor': '#444444'
         },
-        'colorScheme': 'red',
+        'colorScheme': {
+            'name': 'gradient',
+            'args': {
+                'initialColor': 'red',
+            },
+        },
         'legend': {
             'hide': True,
         },

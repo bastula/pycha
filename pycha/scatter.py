@@ -43,7 +43,7 @@ class ScatterplotChart(LineChart):
         cx.set_line_width(self.options.stroke.width)
         # TODO: self.options.stroke.shadow
         for key in self._getDatasetsKeys():
-            cx.set_source_rgb(*self.options.colorScheme[key])
+            cx.set_source_rgb(*self.colorScheme[key])
             preparePath(key)
             cx.stroke()
 
