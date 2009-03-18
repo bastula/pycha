@@ -188,6 +188,11 @@ class FixedColorScheme(ColorScheme):
 
 
 class RainbowColorScheme(ColorScheme):
+    """In this color scheme the rainbow is divided in N pieces
+    where N is the number of datasets.
+
+    So each dataset gets a color of the rainbow.
+    """
 
     def __init__(self, keys, initialColor=DEFAULT_COLOR):
         super(RainbowColorScheme, self).__init__(keys)
