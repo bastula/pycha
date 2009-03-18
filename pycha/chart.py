@@ -16,6 +16,7 @@
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
+import inspect
 import math
 
 import cairo
@@ -120,9 +121,12 @@ class Chart(object):
         keys = self._getDatasetsKeys()
         colorSchemeClass = ColorScheme.getColorScheme(name, None)
         if colorSchemeClass is None:
-            raise ValueError('Color scheme is invalid!')
+            raise ValueError('Color scheme "%s" is invalid!' % name)
 
+        # Remove invalid args before calling the constructor
         kwargs = dict(self.options.colorScheme.args)
+        validArgs = inspect.getargspec(colorSchemeClass.__init__)[0]
+        kwargs = dict([(k, v) for k, v in kwargs.items() if k in validArgs])
         self.colorScheme = colorSchemeClass(keys, **kwargs)
 
     def _initSurface(self, surface):
@@ -671,7 +675,10 @@ DEFAULT_OPTIONS = Option(
     pieRadius=0.4,
     colorScheme=Option(
         name='gradient',
-        args=Option(initialColor=DEFAULT_COLOR),
+        args=Option(
+            initialColor=DEFAULT_COLOR,
+            colors=[],
+            ),
     ),
     title=None,
     titleFont='Tahoma',

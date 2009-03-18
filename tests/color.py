@@ -56,6 +56,24 @@ class ColorTests(unittest.TestCase):
         self.assertEqual(0, color[1])
         self.assertEqual(1, color[2])
 
+    def test_rgb2hsv_and_hsv2rgb(self):
+        for rgb, hsv in (((1.0, 0.0, 0.0), (0.0, 1.0, 1.0)),
+                         ((1.0, 0.5, 0.0), (30.0, 1.0, 1.0)),
+                         ((1.0, 1.0, 0.0), (60.0, 1.0, 1.0)),
+                         ((0.5, 1.0, 0.0), (90.0, 1.0, 1.0)),
+                         ((0.0, 1.0, 0.0), (120.0, 1.0, 1.0)),
+                         ((0.0, 1.0, 0.5), (150.0, 1.0, 1.0)),
+                         ((0.0, 1.0, 1.0), (180.0, 1.0, 1.0)),
+                         ((0.0, 0.5, 1.0), (210.0, 1.0, 1.0)),
+                         ((0.0, 0.0, 1.0), (240.0, 1.0, 1.0)),
+                         ((0.5, 0.0, 1.0), (270.0, 1.0, 1.0)),
+                         ((1.0, 0.0, 1.0), (300.0, 1.0, 1.0)),
+                         ((1.0, 0.0, 0.5), (330.0, 1.0, 1.0)),
+                         ((0.375, 0.5, 0.25), (90.0, 0.5, 0.5)),
+                         ((0.21875, 0.25, 0.1875), (90.0, 0.25, 0.25))):
+            self._assertColors(pycha.color.rgb2hsv(*rgb), hsv, 5)
+            self._assertColors(pycha.color.hsv2rgb(*hsv), rgb, 5)
+
     def test_lighten(self):
         r, g, b = (1.0, 1.0, 0.0)
         r2, g2, b2 = pycha.color.lighten(r, g, b, 0.1)
@@ -79,9 +97,17 @@ class ColorTests(unittest.TestCase):
         self.assertEquals(None,
                           pycha.color.ColorScheme.getColorScheme('foo'))
 
+    def test_FixedColorScheme(self):
+        keys = range(3)
+        colors = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
+        scheme = pycha.color.FixedColorScheme(keys, colors)
+        self._assertColors(scheme[0], (1.0, 0.0, 0.0), 1)
+        self._assertColors(scheme[1], (0.0, 1.0, 0.0), 3)
+        self._assertColors(scheme[2], (0.0, 0.0, 1.0), 3)
+
     def test_GradientColorScheme(self):
         keys = range(5)
-        scheme = pycha.color.GradientColorScheme(keys, "000000")
+        scheme = pycha.color.GradientColorScheme(keys, "#000000")
         self._assertColors(scheme[0], (0.0, 0.0, 0.0), 3)
         self._assertColors(scheme[1], (0.1, 0.1, 0.1), 3)
         self._assertColors(scheme[2], (0.2, 0.2, 0.2), 3)
@@ -106,6 +132,15 @@ class ColorTests(unittest.TestCase):
         self.assertAlmostEqual(color[0], 1.0, 4)
         self.assertNotAlmostEqual(color[1], 1.0, 4)
         self.assertNotAlmostEqual(color[2], 1.0, 4)
+
+    def test_RainbowColorScheme(self):
+        keys = range(5)
+        scheme = pycha.color.GradientColorScheme(keys, "#ff0000")
+        self._assertColors(scheme[0], (1.0, 0.0, 0.0), 3)
+        self._assertColors(scheme[1], (1.0, 0.1, 0.1), 3)
+        self._assertColors(scheme[2], (1.0, 0.2, 0.2), 3)
+        self._assertColors(scheme[3], (1.0, 0.3, 0.3), 3)
+        self._assertColors(scheme[4], (1.0, 0.4, 0.4), 3)
 
 
 def test_suite():

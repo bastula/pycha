@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
+import math
+
 DEFAULT_COLOR = '#3c581a'
 
 
@@ -44,6 +46,61 @@ def hex2rgb(hexstring, digits=2):
     g = int(hexstring[digits+1:digits*2+1], 16)
     b = int(hexstring[digits*2+1:digits*3+1], 16)
     return r / top, g / top, b / top
+
+
+def rgb2hsv(r, g, b):
+    """Converts a RGB color into a HSV one
+
+    See http://en.wikipedia.org/wiki/HSV_color_space
+    """
+    maximum = max(r, g, b)
+    minimum = min(r, g, b)
+    if maximum == minimum:
+        h = 0.0
+    elif maximum == r:
+        h = 60.0 * ((g - b) / (maximum - minimum)) + 360.0
+        if h >= 360.0:
+            h -= 360.0
+    elif maximum == g:
+        h = 60.0 * ((b - r) / (maximum - minimum)) + 120.0
+    elif maximum == b:
+        h = 60.0 * ((r - g) / (maximum - minimum)) + 240.0
+
+    if maximum == 0.0:
+        s = 0.0
+    else:
+        s = 1.0 - (minimum / maximum)
+
+    v = maximum
+
+    return h, s, v
+
+
+def hsv2rgb(h, s, v):
+    """Converts a HSV color into a RGB one
+
+    See http://en.wikipedia.org/wiki/HSV_color_space
+    """
+    hi = int(math.floor(h / 60.0)) % 6
+    f = (h / 60.0) - hi
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+
+    if hi == 0:
+        r, g, b = v, t, p
+    elif hi == 1:
+        r, g, b = q, v, p
+    elif hi == 2:
+        r, g, b = p, v, t
+    elif hi == 3:
+        r, g, b = p, q, v
+    elif hi == 4:
+        r, g, b = t, p, v
+    elif hi == 5:
+        r, g, b = v, p, q
+
+    return r, g, b
 
 
 def lighten(r, g, b, amount):
@@ -111,3 +168,38 @@ class GradientColorScheme(ColorScheme):
 
         for i, key in enumerate(keys):
             self[key] = lighten(r, g, b, light * i)
+
+
+class FixedColorScheme(ColorScheme):
+    """In this color scheme fixed colors are used.
+
+    These colors are provided as a list argument in the constructor.
+    """
+
+    def __init__(self, keys, colors=[]):
+        super(FixedColorScheme, self).__init__(keys)
+
+        if len(keys) != len(colors):
+            raise ValueError("You must provide as many colors as datasets "
+                             "for the fixed color scheme")
+
+        for i, key in enumerate(keys):
+            self[key] = hex2rgb(colors[i])
+
+
+class RainbowColorScheme(ColorScheme):
+
+    def __init__(self, keys, initialColor=DEFAULT_COLOR):
+        super(RainbowColorScheme, self).__init__(keys)
+        if initialColor in basicColors:
+            initialColor = basicColors[initialColor]
+
+        r, g, b = hex2rgb(initialColor)
+        h, s, v = rgb2hsv(r, g, b)
+
+        angleDelta = 360.0 / (len(keys) + 1)
+        for key in keys:
+            self[key] = hsv2rgb(h, s, v)
+            h += angleDelta
+            if h >= 360.0:
+                h -= 360.0
