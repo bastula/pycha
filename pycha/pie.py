@@ -132,6 +132,12 @@ class PieChart(Chart):
         self.xlabels = []
         lookup = dict([(slice.xval, slice) for slice in self.slices])
 
+
+        cx.select_font_face(self.options.axis.tickFont,
+                            cairo.FONT_SLANT_NORMAL,
+                            cairo.FONT_WEIGHT_NORMAL)
+        cx.set_font_size(self.options.axis.tickFontSize)
+
         cx.set_source_rgb(*hex2rgb(self.options.axis.labelColor))
 
         for tick in self.xticks:

@@ -349,6 +349,11 @@ class Chart(object):
         cx.close_path()
         cx.stroke()
 
+        cx.select_font_face(self.options.axis.tickFont,
+                            cairo.FONT_SLANT_NORMAL,
+                            cairo.FONT_WEIGHT_NORMAL)
+        cx.set_font_size(self.options.axis.tickFontSize)
+
         label = unicode(tick[1])
         extents = cx.text_extents(label)
         labelWidth = extents[2]
@@ -383,6 +388,11 @@ class Chart(object):
         cx.line_to(x, y + self.options.axis.tickSize)
         cx.close_path()
         cx.stroke()
+
+        cx.select_font_face(self.options.axis.tickFont,
+                            cairo.FONT_SLANT_NORMAL,
+                            cairo.FONT_WEIGHT_NORMAL)
+        cx.set_font_size(self.options.axis.tickFontSize)
 
         label = unicode(tick[1])
         extents = cx.text_extents(label)
@@ -637,6 +647,8 @@ DEFAULT_OPTIONS = Option(
         labelFont='Tahoma',
         labelFontSize=9,
         labelWidth=50.0,
+        tickFont='Tahoma',
+        tickFontSize=9,
         x=Option(
             hide=False,
             ticks=None,
