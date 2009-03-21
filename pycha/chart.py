@@ -226,6 +226,15 @@ class Chart(object):
                 if 0.0 <= pos <= 1.0:
                     self.xticks.append((pos, label))
 
+        elif self.options.axis.x.interval > 0:
+            interval = self.options.axis.x.interval
+            label = (divmod(self.minxval, interval)[0] + 1) * interval
+            pos = self.xscale * (label - self.minxval)
+            while 0.0 <= pos <= 1.0:
+                self.xticks.append((pos, label))
+                label += interval
+                pos = self.xscale * (label - self.minxval)
+
         elif self.options.axis.x.tickCount > 0:
             uniqx = range(len(uniqueIndices(stores)) + 1)
             roughSeparation = self.xrange / self.options.axis.x.tickCount
@@ -251,6 +260,15 @@ class Chart(object):
                 pos = 1.0 - (self.yscale * (tick.v - self.minyval))
                 if 0.0 <= pos <= 1.0:
                     self.yticks.append((pos, label))
+
+        elif self.options.axis.y.interval > 0:
+            interval = self.options.axis.y.interval
+            label = (divmod(self.minyval, interval)[0] + 1) * interval
+            pos = 1.0 - (self.yscale * (label - self.minyval))
+            while 0.0 <= pos <= 1.0:
+                self.yticks.append((pos, label))
+                label += interval
+                pos = 1.0 - (self.yscale * (label - self.minyval))
 
         elif self.options.axis.y.tickCount > 0:
             prec = self.options.axis.y.tickPrecision
@@ -627,6 +645,7 @@ DEFAULT_OPTIONS = Option(
             range=None,
             rotate=None,
             label=None,
+            interval=0,
         ),
         y=Option(
             hide=False,
@@ -636,6 +655,7 @@ DEFAULT_OPTIONS = Option(
             range=None,
             rotate=None,
             label=None,
+            interval=0,
         ),
     ),
     background=Option(
