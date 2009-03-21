@@ -64,6 +64,7 @@ class App(object):
                 range=list,
                 rotate=float,
                 label=unicode,
+                interval=int,
                 ),
             y=dict(
                 hide=bool,
@@ -73,6 +74,7 @@ class App(object):
                 range=list,
                 rotate=float,
                 label=unicode,
+                interval=int,
                 ),
             ),
         background=dict(
@@ -115,7 +117,13 @@ class App(object):
         shouldFill=bool,
         barWidthFillFraction=float,
         pieRadius=float,
-        colorScheme=str,
+        colorScheme=dict(
+            name=str,
+            args=dict(
+                initialColor=str,
+                colors=list,
+                ),
+            ),
         title=unicode,
         titleFont=str,
         titleFontSize=int,

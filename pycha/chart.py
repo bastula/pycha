@@ -697,7 +697,7 @@ DEFAULT_OPTIONS = Option(
         name='gradient',
         args=Option(
             initialColor=DEFAULT_COLOR,
-            colors=[],
+            colors=None,
             ),
     ),
     title=None,
