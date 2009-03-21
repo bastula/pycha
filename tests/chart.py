@@ -227,6 +227,25 @@ class ChartTests(unittest.TestCase):
         self.assertAlmostEqual(ch.xscale, 0.1111, 4)
         self.assertAlmostEqual(ch.yscale, 0.1111, 4)
 
+    def test_interval(self):
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+        opt = {'axis': {'y': {'interval': 2.5}}}
+        ch = pycha.chart.Chart(surface, opt)
+        dataset = (
+            ('dataset1', ([0, 1], [1, 4], [2, 10])),
+            )
+        ch.addDataset(dataset)
+        ch._updateXY()
+        ch._updateTicks()
+        yticks = ((0.75, 2.5), (0.5, 5.0),
+                  (0.25, 7.5), (0.0, 10.0))
+
+        self.assertEqual(len(yticks), len(ch.yticks))
+        for i, (pos, label) in enumerate(yticks):
+            tick = ch.yticks[i]
+            self.assertAlmostEqual(tick[0], pos, 2)
+            self.assertAlmostEqual(tick[1], label, 2)
+
 
 def test_suite():
     return unittest.TestSuite((
