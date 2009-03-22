@@ -1,9 +1,13 @@
 Changes
 =======
 
-0.4.3 (unreleased)
+0.5.0 (2009-03-22)
 ------------------
-- ...
+- Bar chart fixes (Adam)
+- Support for custon fonts in the ticks (Ged)
+- Support for an 'interval' option (Nicolas)
+- New color scheme system (Lorenzo)
+- Stacked bar charts support (Lorenzo)
 
 0.4.2 (2009-02-15)
 ------------------
