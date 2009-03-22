@@ -133,6 +133,13 @@ the cairo library::
 That's it! You can see more examples in the examples directory of the source
 code.
 
+Documentation
+-------------
+
+Adam Przywecki has done a fantastic work writing documentation for Pycha.
+Check it out at http://pycha.yourwei.com/
+
+
 Development
 -----------
 
@@ -141,3 +148,13 @@ the subversion repository::
 
    svn co http://www.lorenzogil.com/svn/pycha/trunk pycha
 
+Don't forget to check the 
+`Release Notes <http://www.lorenzogil.com/projects/pycha/wiki/ReleaseNotes/>`_ 
+for each version to learn the new features and incompatible changes. 
+
+Contact
+-------
+
+There is a mailing list about PyCha at http://groups.google.com/group/pycha 
+You can join it to ask questions about its use or simply to talk about its
+development. Your ideas and feedback are greatly appreciated! 
