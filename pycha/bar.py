@@ -78,14 +78,15 @@ class BarChart(Chart):
                 cx.fill()
 
             if self.options.shouldFill or (not self.options.stroke.hide):
-                cx.rectangle(x, y, w, h)
 
                 if self.options.shouldFill:
                     cx.set_source_rgb(*self.colorScheme[bar.name])
-                    cx.fill_preserve()
+                    cx.rectangle(x, y, w, h)
+                    cx.fill()
 
                 if not self.options.stroke.hide:
                     cx.set_source_rgb(*hex2rgb(self.options.stroke.color))
+                    cx.rectangle(x, y, w, h)
                     cx.stroke()
 
             # render yvals above/beside bars
