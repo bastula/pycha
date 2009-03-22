@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2008 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2009 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -21,6 +21,7 @@ import cairo
 
 import pycha.bar
 
+
 class RectTests(unittest.TestCase):
 
     def test_rect(self):
@@ -33,6 +34,7 @@ class RectTests(unittest.TestCase):
         self.assertEqual(r.yval, 3.4)
         self.assertEqual(r.name, 'test')
 
+
 class BarTests(unittest.TestCase):
 
     def test_init(self):
@@ -44,7 +46,7 @@ class BarTests(unittest.TestCase):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
         # An evil dataset with just one point. See bug #9
         dataset = (
-            ('dataset1', ([0, 0],)),
+            ('dataset1', ([0, 0], )),
         )
         ch = pycha.bar.BarChart(surface)
         ch.addDataset(dataset)
@@ -53,8 +55,35 @@ class BarTests(unittest.TestCase):
 
         self.assertEqual(ch.xscale, 1.0)
         self.assertEqual(ch.minxval, 0)
+        self.assertEqual(ch.minxdelta, 1.0)
         self.assertAlmostEqual(ch.barWidthForSet, 0.75, 4)
         self.assertAlmostEqual(ch.barMargin, 0.125, 4)
+
+    def test_customRangeWithOnePoint(self):
+        """Weird results with a custom range and just one point. See bug #20"""
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+
+        dataset = (
+            ('dataset1', ([0, 1], )),
+        )
+        options = {
+            'axis': {
+                'x': {
+                    'range': (0.0, 4.0),
+                    },
+                },
+            }
+        ch = pycha.bar.BarChart(surface, options)
+        ch.addDataset(dataset)
+        ch._updateXY()
+        ch._updateChart()
+
+        self.assertEqual(ch.xscale, 0.2)
+        self.assertEqual(ch.minxval, 0)
+        self.assertEqual(ch.minxdelta, 1.0)
+        self.assertAlmostEqual(ch.barWidthForSet, 0.15, 2)
+        self.assertAlmostEqual(ch.barMargin, 0.025, 3)
+
 
 class VerticalBarTests(unittest.TestCase):
 
@@ -131,8 +160,8 @@ class VerticalBarTests(unittest.TestCase):
         bars = (
             R(0.03125, 0.625, 0.1875, 0.375, 0, -3, 'dataset1'),
             R(0.28125, 0.625, 0.1875, 0.125, 1, -1, 'dataset1'),
-            R(0.53125, 0.250, 0.1875, 0.375, 2,  3, 'dataset1'),
-            R(0.78125, 0.000, 0.1875, 0.625, 3,  5, 'dataset1'),
+            R(0.53125, 0.250, 0.1875, 0.375, 2, 3, 'dataset1'),
+            R(0.78125, 0.000, 0.1875, 0.625, 3, 5, 'dataset1'),
             )
 
         for i, bar in enumerate(bars):
@@ -164,7 +193,7 @@ class VerticalBarTests(unittest.TestCase):
         yticks = [
             (1.0, 0.0), (0.9, 0.4), (0.8, 0.8), (0.7, 1.2), (0.6, 1.6),
             (0.5, 2.0), (0.4, 2.4), (0.3, 2.8), (0.2, 3.2), (0.1, 3.6),
-            (0.0, 4.0)
+            (0.0, 4.0),
             ]
         for i in range(len(yticks)):
             self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
@@ -188,7 +217,7 @@ class VerticalBarTests(unittest.TestCase):
         yticks = [
             (1.0, -2.0), (0.9, -1.5), (0.8, -1.0), (0.7, -0.5), (0.6, 0.0),
             (0.5, 0.5), (0.4, 1.0), (0.3, 1.5), (0.2, 2.0), (0.1, 2.5),
-            (0.0, 3.0)
+            (0.0, 3.0),
             ]
         for i in range(len(yticks)):
             self.assertAlmostEqual(ch.yticks[i][0], yticks[i][0], 4)
@@ -198,6 +227,7 @@ class VerticalBarTests(unittest.TestCase):
         ch = pycha.bar.VerticalBarChart(None)
         shadow = ch._getShadowRectangle(10, 20, 400, 300)
         self.assertEqual(shadow, (8, 18, 404, 302))
+
 
 class HorizontalBarTests(unittest.TestCase):
 
@@ -294,7 +324,7 @@ class HorizontalBarTests(unittest.TestCase):
         xticks = [
             (0.0, 0.0), (0.1, 0.4), (0.2, 0.8), (0.3, 1.2), (0.4, 1.6),
             (0.5, 2.0), (0.6, 2.4), (0.7, 2.8), (0.8, 3.2), (0.9, 3.6),
-            (1.0, 4.0)
+            (1.0, 4.0),
             ]
         for i in range(len(xticks)):
             self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
@@ -318,7 +348,7 @@ class HorizontalBarTests(unittest.TestCase):
         xticks = [
             (0.0, -2.0), (0.1, -1.5), (0.2, -1.0), (0.3, -0.5), (0.4, 0.0),
             (0.5, 0.5), (0.6, 1.0), (0.7, 1.5), (0.8, 2.0), (0.9, 2.5),
-            (1.0, 3.0)
+            (1.0, 3.0),
             ]
         for i in range(len(xticks)):
             self.assertAlmostEqual(ch.xticks[i][0], xticks[i][0], 4)
@@ -334,6 +364,7 @@ class HorizontalBarTests(unittest.TestCase):
         shadow = ch._getShadowRectangle(10, 20, 400, 300)
         self.assertEqual(shadow, (10, 18, 402, 304))
 
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(RectTests),
@@ -344,4 +375,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-

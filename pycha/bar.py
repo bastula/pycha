@@ -39,21 +39,17 @@ class BarChart(Chart):
         stores = self._getDatasetsValues()
         uniqx = uniqueIndices(stores)
 
-        barWidth = 0
         if len(uniqx) == 1:
-            xdelta = 1.0
-            barWidth = 1.0 * self.options.barWidthFillFraction
-            self.barWidthForSet = barWidth / len(stores)
-            self.barMargin = (1.0 - self.options.barWidthFillFraction) / 2
+            self.minxdelta = 1.0
         else:
-            xdelta = min([abs(uniqx[j] - uniqx[j-1])
-                          for j in range(1, len(uniqx))])
-            barWidth = xdelta * self.xscale * self.options.barWidthFillFraction
-            self.barWidthForSet = barWidth / len(stores)
-            self.barMargin = (xdelta * self.xscale
-                              * (1.0 - self.options.barWidthFillFraction) / 2)
+            self.minxdelta = min([abs(uniqx[j] - uniqx[j-1])
+                                  for j in range(1, len(uniqx))])
 
-        self.minxdelta = xdelta
+        k = self.minxdelta * self.xscale
+        barWidth = k * self.options.barWidthFillFraction
+        self.barWidthForSet = barWidth / len(stores)
+        self.barMargin = k * (1.0 - self.options.barWidthFillFraction) / 2
+
         self.bars = []
 
     def _renderChart(self, cx):
