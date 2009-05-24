@@ -29,6 +29,7 @@ def pieChart(colorScheme):
             'hide': True,
         },
         'colorScheme': colorScheme,
+        'title': colorScheme['name'],
     }
     chart = pycha.pie.PieChart(surface, options)
 
