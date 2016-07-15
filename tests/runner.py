@@ -17,12 +17,12 @@
 
 import unittest
 
-import bar
-import chart
-import color
-import line
-import pie
-import utils
+from . import bar
+from . import chart
+from . import color
+from . import line
+from . import pie
+from . import utils
 
 def test_suite():
     return unittest.TestSuite((

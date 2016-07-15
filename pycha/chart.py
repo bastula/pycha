@@ -20,6 +20,7 @@ import inspect
 import math
 
 import cairo
+from six.moves import reduce
 
 from pycha.color import ColorScheme, hex2rgb, DEFAULT_COLOR
 from pycha.utils import safe_unicode

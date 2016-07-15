@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
+import six
+
+unicode = six.text_type
+
+
 def clamp(minValue, maxValue, value):
     """Make sure value is between minValue and maxValue"""
     if value < minValue:

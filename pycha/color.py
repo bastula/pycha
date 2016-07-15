@@ -18,6 +18,8 @@
 
 import math
 
+import six
+
 from pycha.utils import clamp
 
 
@@ -123,11 +125,10 @@ class ColorSchemeMetaclass(type):
         return klass
 
 
-class ColorScheme(dict):
+class ColorScheme(six.with_metaclass(ColorSchemeMetaclass, dict)):
     """A color scheme is a dictionary where the keys match the keys
     constructor argument and the values are colors"""
 
-    __metaclass__ = ColorSchemeMetaclass
     __registry__ = {}
 
     def __init__(self, keys):

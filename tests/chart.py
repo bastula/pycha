@@ -35,7 +35,7 @@ class FunctionsTests(unittest.TestCase):
         self.assertEqual(pycha.chart.uniqueIndices(arr), range(4))
 
         arr = (range(0), )
-        self.assertEqual(pycha.chart.uniqueIndices(arr), [])
+        self.assertEqual(pycha.chart.uniqueIndices(arr), range(0))
 
 
 class AreaTests(unittest.TestCase):
