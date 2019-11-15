@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2012 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -20,8 +20,16 @@ from setuptools import setup
 
 from pycha import version
 
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+
+requires = [
+    'six',
+    'cairocffi',
+]
+
 
 setup(
     name="pycha",
@@ -38,16 +46,13 @@ setup(
     keywords="chart cairo",
     packages=['pycha', 'chavier'],
     url='http://bitbucket.org/lgs/pycha/',
-    install_requires = [
-        'six',
-        # if would be nice if pycairo would have an egg (sigh)
-        # 'pycairo',
-    ],
+    install_requires=requires,
     zip_safe=True,
     entry_points={
         'gui_scripts': [
             'chavier = chavier.app:main',
         ]
     },
+    tests_require=requires,
     test_suite="tests",
 )

@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -17,7 +17,7 @@
 
 import math
 
-import cairo
+import cairocffi as cairo
 
 from pycha.chart import Chart, Option, Layout, Area, get_text_extents
 from pycha.color import hex2rgb

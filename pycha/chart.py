@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -19,7 +19,7 @@ import copy
 import inspect
 import math
 
-import cairo
+import cairocffi as cairo
 from six.moves import reduce
 
 from pycha.color import ColorScheme, hex2rgb, DEFAULT_COLOR
@@ -139,7 +139,7 @@ class Chart(object):
 
         # Remove invalid args before calling the constructor
         kwargs = dict(self.options.colorScheme.args)
-        validArgs = inspect.getargspec(colorSchemeClass.__init__)[0]
+        validArgs = inspect.getfullargspec(colorSchemeClass.__init__).args
         kwargs = dict([(k, v) for k, v in kwargs.items() if k in validArgs])
         self.colorScheme = colorSchemeClass(keys, **kwargs)
 

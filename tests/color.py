@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #              2009 by Yaco S.L. <lgs@yaco.es>
 #
 # This file is part of PyCha.
@@ -29,7 +29,7 @@ class ColorTests(unittest.TestCase):
 
     def test_hex2rgb(self):
         color = pycha.color.hex2rgb('#ff0000')
-        self.assert_(isinstance(color, tuple))
+        self.assertTrue(isinstance(color, tuple))
         self.assertAlmostEqual(1, color[0])
         self.assertAlmostEqual(0, color[1])
         self.assertAlmostEqual(0, color[2])
@@ -38,13 +38,13 @@ class ColorTests(unittest.TestCase):
         self.assertEqual(color, color2)
 
         color = pycha.color.hex2rgb('#000fff000', digits=3)
-        self.assert_(isinstance(color, tuple))
+        self.assertTrue(isinstance(color, tuple))
         self.assertEqual(0, color[0])
         self.assertEqual(1, color[1])
         self.assertEqual(0, color[2])
 
         color = pycha.color.hex2rgb('#00000000ffff', digits=4)
-        self.assert_(isinstance(color, tuple))
+        self.assertTrue(isinstance(color, tuple))
         self.assertEqual(0, color[0])
         self.assertEqual(0, color[1])
         self.assertEqual(1, color[2])
@@ -82,13 +82,13 @@ class ColorTests(unittest.TestCase):
     def test_basicColors(self):
         colors = ('red', 'green', 'blue', 'grey', 'black', 'darkcyan')
         for color in colors:
-            self.assert_(color in pycha.color.basicColors)
+            self.assertTrue(color in pycha.color.basicColors)
 
     def test_ColorSchemeRegistry(self):
-        self.assertEquals(SimpleColorScheme,
-                          pycha.color.ColorScheme.getColorScheme('simple'))
-        self.assertEquals(None,
-                          pycha.color.ColorScheme.getColorScheme('foo'))
+        self.assertEqual(SimpleColorScheme,
+                         pycha.color.ColorScheme.getColorScheme('simple'))
+        self.assertEqual(None,
+                         pycha.color.ColorScheme.getColorScheme('foo'))
 
     def test_FixedColorScheme(self):
         keys = range(3)

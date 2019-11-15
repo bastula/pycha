@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -24,6 +24,7 @@ from . import line
 from . import pie
 from . import utils
 
+
 def test_suite():
     return unittest.TestSuite((
         bar.test_suite(),
@@ -33,6 +34,7 @@ def test_suite():
         pie.test_suite(),
         utils.test_suite(),
     ))
+
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')

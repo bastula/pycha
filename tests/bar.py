@@ -17,7 +17,7 @@
 
 import unittest
 
-import cairo
+import cairocffi as cairo
 
 import pycha.bar
 
