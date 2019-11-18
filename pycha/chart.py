@@ -16,13 +16,13 @@
 # along with PyCha.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
-import inspect
 import math
 
 import cairocffi as cairo
 from six.moves import reduce
 
 from pycha.color import ColorScheme, hex2rgb, DEFAULT_COLOR
+from pycha.compat import getfullargspec
 from pycha.utils import safe_unicode
 
 
@@ -139,7 +139,7 @@ class Chart(object):
 
         # Remove invalid args before calling the constructor
         kwargs = dict(self.options.colorScheme.args)
-        validArgs = inspect.getfullargspec(colorSchemeClass.__init__).args
+        validArgs = getfullargspec(colorSchemeClass.__init__).args
         kwargs = dict([(k, v) for k, v in kwargs.items() if k in validArgs])
         self.colorScheme = colorSchemeClass(keys, **kwargs)
 

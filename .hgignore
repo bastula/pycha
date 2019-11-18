@@ -6,7 +6,10 @@ syntax: glob
 bin
 develop-eggs
 eggs
+.eggs
 examples/*.png
 examples/*.svg
 docs/build/*
 parts
+.tox
+venv
