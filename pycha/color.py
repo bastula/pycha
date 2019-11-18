@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #              2009 by Yaco S.L. <lgs@yaco.es>
 #
 # This file is part of PyCha.
@@ -38,9 +38,9 @@ def hex2rgb(hexstring, digits=2):
         return hexstring
 
     top = float(int(digits * 'f', 16))
-    r = int(hexstring[1:digits+1], 16)
-    g = int(hexstring[digits+1:digits*2+1], 16)
-    b = int(hexstring[digits*2+1:digits*3+1], 16)
+    r = int(hexstring[1:digits + 1], 16)
+    g = int(hexstring[digits + 1:digits * 2 + 1], 16)
+    b = int(hexstring[digits * 2 + 1:digits * 3 + 1], 16)
     return r / top, g / top, b / top
 
 
@@ -113,7 +113,7 @@ basicColors = dict(
     grey='#444444',
     black='#000000',
     darkcyan='#305755',
-    )
+)
 
 
 class ColorSchemeMetaclass(type):

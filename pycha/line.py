@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -48,7 +48,7 @@ class LineChart(Chart):
             lastX = None
             if self.options.shouldFill:
                 # Go to the (0,0) coordinate to start drawing the area
-                #cx.move_to(self.layout.chart.x,
+                # cx.move_to(self.layout.chart.x,
                 #           self.layout.chart.y + self.layout.chart.h)
                 offset = (1.0 - self.origin) * self.layout.chart.h
                 cx.move_to(self.layout.chart.x, self.layout.chart.y + offset)
@@ -57,32 +57,29 @@ class LineChart(Chart):
                 if point.name == storeName:
                     if not self.options.shouldFill and firstPoint:
                         # starts the first point of the line
-                        cx.move_to(point.x * self.layout.chart.w
-                                   + self.layout.chart.x,
-                                   point.y * self.layout.chart.h
-                                   + self.layout.chart.y)
+                        cx.move_to(
+                            point.x * self.layout.chart.w + self.layout.chart.x,
+                            point.y * self.layout.chart.h + self.layout.chart.y
+                        )
                         firstPoint = False
                         continue
-                    cx.line_to(point.x * self.layout.chart.w
-                               + self.layout.chart.x,
-                               point.y * self.layout.chart.h
-                               + self.layout.chart.y)
+                    cx.line_to(
+                        point.x * self.layout.chart.w + self.layout.chart.x,
+                        point.y * self.layout.chart.h + self.layout.chart.y
+                    )
                     # we remember the last X coordinate to close the area
                     # properly. See bug #4
                     lastX = point.x
 
             if self.options.shouldFill:
                 # Close the path to the start point
-                y = ((1.0 - self.origin) * self.layout.chart.h
-                     + self.layout.chart.y)
-                cx.line_to(lastX * self.layout.chart.w
-                           + self.layout.chart.x, y)
+                y = ((1.0 - self.origin) * self.layout.chart.h + self.layout.chart.y)
+                cx.line_to(lastX * self.layout.chart.w + self.layout.chart.x, y)
                 cx.line_to(self.layout.chart.x, y)
                 cx.close_path()
             else:
                 cx.set_source_rgb(*self.colorScheme[storeName])
                 cx.stroke()
-
 
         cx.save()
         cx.set_line_width(self.options.stroke.width)

@@ -1,4 +1,5 @@
 # Copyright(c) 2011 by Roberto Garcia Carvajal <roberpot@gmail.com>
+#              2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -139,11 +140,10 @@ class RadialChart(Chart):
 
         if self.options.axis.y.rotate:
             radians = math.radians(self.options.axis.y.rotate)
-            cx.move_to(x - self.options.axis.tickSize
-                       - (labelWidth * math.cos(radians))
-                       - 4,
-                       y + (labelWidth * math.sin(radians))
-                       + labelHeight / (2.0 / math.cos(radians)))
+            cx.move_to(
+                x - self.options.axis.tickSize - (labelWidth * math.cos(radians)) - 4,
+                y + (labelWidth * math.sin(radians)) + labelHeight / (2.0 / math.cos(radians))
+            )
             cx.rotate(-radians)
             cx.show_text(label)
             cx.rotate(radians)  # this is probably faster than a save/restore
@@ -236,10 +236,10 @@ class RadialChart(Chart):
 
         if self.options.axis.x.rotate:
             radians = math.radians(self.options.axis.x.rotate)
-            cx.move_to(x - (labelHeight * math.cos(radians)),
-                       y + self.options.axis.tickSize
-                       + (labelHeight * math.cos(radians))
-                       + 4.0)
+            cx.move_to(
+                x - (labelHeight * math.cos(radians)),
+                y + self.options.axis.tickSize + (labelHeight * math.cos(radians)) + 4.0
+            )
             cx.rotate(radians)
             cx.show_text(label)
             cx.rotate(-radians)
@@ -301,13 +301,12 @@ class RadialChart(Chart):
                         continue
                     cx.line_to(x, y)
 
-            if not firstPointCoord is None:
+            if firstPointCoord is not None:
                 cx.line_to(firstPointCoord[0], firstPointCoord[1])
 
             if self.options.shouldFill:
                 # Close the path to the start point
-                y = ((1.0 - self.origin)
-                     * self.layout.chart.h + self.layout.chart.y)
+                y = ((1.0 - self.origin) * self.layout.chart.h + self.layout.chart.y)
             else:
                 cx.set_source_rgb(*self.colorScheme[storeName])
                 cx.stroke()

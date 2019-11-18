@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright(c) 2007-2019 by Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -43,7 +43,7 @@ class BarChart(Chart):
         if len(uniqx) == 1:
             self.minxdelta = 1.0
         else:
-            self.minxdelta = min([abs(uniqx[j] - uniqx[j-1])
+            self.minxdelta = min([abs(uniqx[j] - uniqx[j - 1])
                                   for j in range(1, len(uniqx))])
 
         k = self.minxdelta * self.xscale
@@ -70,7 +70,7 @@ class BarChart(Chart):
             h = self.layout.chart.h * bar.h
 
             if (w < 1 or h < 1) and self.options.yvals.skipSmallValues:
-                return # don't draw when the bar is too small
+                return  # don't draw when the bar is too small
 
             if self.options.stroke.shadow:
                 cx.set_source_rgba(0, 0, 0, 0.15)
@@ -129,13 +129,11 @@ class VerticalBarChart(BarChart):
         for i, (name, store) in enumerate(self.datasets):
             for item in store:
                 if len(item) == 3:
-                    xval, yval, yerr = item
+                    xval, yval, _ = item
                 else:
                     xval, yval = item
-                    yerr = 0.0
 
-                x = (((xval - self.minxval) * self.xscale)
-                    + self.barMargin + (i * self.barWidthForSet))
+                x = (((xval - self.minxval) * self.xscale) + self.barMargin + (i * self.barWidthForSet))
                 w = self.barWidthForSet
                 h = abs(yval) * self.yscale
                 if yval > 0:
@@ -154,7 +152,7 @@ class VerticalBarChart(BarChart):
         self.xticks = [(tick[0] + offset, tick[1]) for tick in self.xticks]
 
     def _getShadowRectangle(self, x, y, w, h):
-        return (x-2, y-2, w+4, h+2)
+        return (x - 2, y - 2, w + 4, h + 2)
 
     def _renderYVal(self, cx, label, labelW, labelH, barX, barY, barW, barH):
         x = barX + (barW / 2.0) - (labelW / 2.0)
@@ -207,8 +205,7 @@ class HorizontalBarChart(BarChart):
                     xval, yval = item
                     yerr = 0.0
 
-                y = (((xval - self.minxval) * self.xscale)
-                     + self.barMargin + (i * self.barWidthForSet))
+                y = (((xval - self.minxval) * self.xscale) + self.barMargin + (i * self.barWidthForSet))
                 h = self.barWidthForSet
                 w = abs(yval) * self.yscale
                 if yval > 0:
@@ -238,7 +235,7 @@ class HorizontalBarChart(BarChart):
                 self._renderLine(cx, tick, False)
 
     def _getShadowRectangle(self, x, y, w, h):
-        return (x, y-2, w+2, h+4)
+        return (x, y - 2, w + 2, h + 4)
 
     def _renderXAxisLabel(self, cx, labelText):
         labelText = self.options.axis.x.label

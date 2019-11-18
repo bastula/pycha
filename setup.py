@@ -25,9 +25,17 @@ def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 
-requires = [
+base_requirements = [
     'six',
     'cairocffi',
+]
+
+testing_requirements = [
+    'coverage',
+    'mccabe',    # required by flake8
+    'pep8',      # required by flake8
+    'pyflakes',  # required by flake8
+    'flake8',
 ]
 
 
@@ -37,22 +45,21 @@ setup(
     author="Lorenzo Gil Sanchez",
     author_email="lorenzo.gil.sanchez@gmail.com",
     description="A library for making charts with Python",
-    long_description=(
-        read('README.txt')
-        + '\n\n' +
-        read('CHANGES.txt')
-    ),
+    long_description=(read('README.txt') + '\n\n' + read('CHANGES.txt')),
     license="LGPL 3",
     keywords="chart cairo",
     packages=['pycha', 'chavier'],
     url='http://bitbucket.org/lgs/pycha/',
-    install_requires=requires,
+    install_requires=base_requirements,
     zip_safe=True,
     entry_points={
         'gui_scripts': [
             'chavier = chavier.app:main',
         ]
     },
-    tests_require=requires,
+    tests_require=base_requirements,
+    extras_require={
+        'testing': testing_requirements,
+    },
     test_suite="tests",
 )

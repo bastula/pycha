@@ -170,7 +170,7 @@ class Chart(object):
         if x_range_is_defined:
             self.minxval, self.maxxval = self.options.axis.x.range
         else:
-            xdata = [pair[0] for pair in reduce(lambda a, b: a+b, stores)]
+            xdata = [pair[0] for pair in reduce(lambda a, b: a + b, stores)]
             self.minxval = float(min(xdata))
             self.maxxval = float(max(xdata))
             if self.minxval * self.maxxval > 0 and self.minxval > 0:
@@ -186,7 +186,7 @@ class Chart(object):
         if y_range_is_defined:
             self.minyval, self.maxyval = self.options.axis.y.range
         else:
-            ydata = [pair[1] for pair in reduce(lambda a, b: a+b, stores)]
+            ydata = [pair[1] for pair in reduce(lambda a, b: a + b, stores)]
             self.minyval = float(min(ydata))
             self.maxyval = float(max(ydata))
             if self.minyval * self.maxyval > 0 and self.minyval > 0:
@@ -198,7 +198,7 @@ class Chart(object):
         else:
             self.yscale = 1.0 / self.yrange
 
-        if self.minyval * self.maxyval < 0: # different signs
+        if self.minyval * self.maxyval < 0:  # different signs
             self.origin = abs(self.minyval) * self.yscale
         else:
             self.origin = 0.0
@@ -312,11 +312,11 @@ class Chart(object):
         if self.options.background.chartColor:
             cx.set_source_rgb(*hex2rgb(self.options.background.chartColor))
             surface_width, surface_height = self.getSurfaceSize()
-            cx.rectangle(self.options.padding.left, self.options.padding.top,
-                         surface_width - (self.options.padding.left
-                                          + self.options.padding.right),
-                         surface_height - (self.options.padding.top
-                                           + self.options.padding.bottom))
+            cx.rectangle(
+                self.options.padding.left, self.options.padding.top,
+                surface_width - (self.options.padding.left + self.options.padding.right),
+                surface_height - (self.options.padding.top + self.options.padding.bottom)
+            )
             cx.fill()
 
         if self.options.background.lineColor:
@@ -405,8 +405,10 @@ class Chart(object):
         x = self.layout.y_ticks.x + self.layout.y_ticks.w
         y = self.layout.y_ticks.y + tick[0] * self.layout.y_ticks.h
 
-        text_position = ((self.layout.y_tick_labels.x
-                          + self.layout.y_tick_labels.w / 2.0), y)
+        text_position = (
+            (self.layout.y_tick_labels.x + self.layout.y_tick_labels.w / 2.0),
+            y
+        )
 
         return self._renderTick(cx, tick,
                                 x, y,
@@ -420,8 +422,10 @@ class Chart(object):
         x = self.layout.x_ticks.x + tick[0] * self.layout.x_ticks.w
         y = self.layout.x_ticks.y
 
-        text_position = (x, (self.layout.x_tick_labels.y
-                             + self.layout.x_tick_labels.h / 2.0))
+        text_position = (
+            x,
+            (self.layout.x_tick_labels.y + self.layout.x_tick_labels.h / 2.0)
+        )
 
         return self._renderTick(cx, tick,
                                 x, y,
@@ -532,9 +536,7 @@ class Chart(object):
             extents = cx.text_extents(title)
             title_width = extents[2]
 
-            x = (self.layout.title.x
-                 + self.layout.title.w / 2.0
-                 - title_width / 2.0)
+            x = (self.layout.title.x + self.layout.title.w / 2.0 - title_width / 2.0)
             y = self.layout.title.y - extents[1]
 
             cx.move_to(x, y)
@@ -569,13 +571,13 @@ class Chart(object):
         # Compute legend position
         legend = self.options.legend
         if legend.position.right is not None:
-            legend.position.left = (surface_width
-                                    - legend.position.right
-                                    - width)
+            legend.position.left = (
+                surface_width - legend.position.right - width
+            )
         if legend.position.bottom is not None:
-            legend.position.top = (surface_height
-                                   - legend.position.bottom
-                                   - height)
+            legend.position.top = (
+                surface_height - legend.position.bottom - height
+            )
 
         # Draw the legend
         cx.save()
@@ -622,7 +624,7 @@ class Area(object):
 
     def __str__(self):
         msg = "<pycha.chart.Area@(%.2f, %.2f) %.2f x %.2f>"
-        return  msg % (self.x, self.y, self.w, self.h)
+        return msg % (self.x, self.y, self.w, self.h)
 
 
 def get_text_extents(cx, text, font, font_size, encoding):
@@ -652,15 +654,15 @@ class Layout(object):
         self.chart = Area()
 
         self._areas = (
-            (self.title, (1, 126/255.0, 0)), # orange
-            (self.y_label, (41/255.0, 91/255.0, 41/255.0)), # grey
-            (self.x_label, (41/255.0, 91/255.0, 41/255.0)), # grey
-            (self.y_tick_labels, (0, 115/255.0, 0)), # green
-            (self.x_tick_labels, (0, 115/255.0, 0)), # green
-            (self.y_ticks, (229/255.0, 241/255.0, 18/255.0)), # yellow
-            (self.x_ticks, (229/255.0, 241/255.0, 18/255.0)), # yellow
-            (self.chart, (75/255.0, 75/255.0, 1.0)), # blue
-            )
+            (self.title, (1, 126 / 255.0, 0)),  # orange
+            (self.y_label, (41 / 255.0, 91 / 255.0, 41 / 255.0)),  # grey
+            (self.x_label, (41 / 255.0, 91 / 255.0, 41 / 255.0)),  # grey
+            (self.y_tick_labels, (0, 115 / 255.0, 0)),  # green
+            (self.x_tick_labels, (0, 115 / 255.0, 0)),  # green
+            (self.y_ticks, (229 / 255.0, 241 / 255.0, 18 / 255.0)),  # yellow
+            (self.x_ticks, (229 / 255.0, 241 / 255.0, 18 / 255.0)),  # yellow
+            (self.chart, (75 / 255.0, 75 / 255.0, 1.0)),  # blue
+        )
 
     def update(self, cx, options, width, height, xticks, yticks):
         self.title.x = options.padding.left
@@ -692,23 +694,16 @@ class Layout(object):
         self.y_label.x = options.padding.left
         self.y_label.y = options.padding.top + self.title.h
         self.y_label.w = y_axis_label_width
-        self.y_label.h = height - (options.padding.bottom
-                                   + options.padding.top
-                                   + x_axis_label_height
-                                   + x_axis_tick_labels_height
-                                   + options.axis.tickSize
-                                   + self.title.h)
-        self.x_label.x = (options.padding.left
-                          + y_axis_label_width
-                          + y_axis_tick_labels_width
-                          + options.axis.tickSize)
-        self.x_label.y = height - (options.padding.bottom
-                                   + x_axis_label_height)
-        self.x_label.w = width - (options.padding.left
-                                  + options.padding.right
-                                  + options.axis.tickSize
-                                  + y_axis_label_width
-                                  + y_axis_tick_labels_width)
+        self.y_label.h = height - (
+            options.padding.bottom + options.padding.top + x_axis_label_height + x_axis_tick_labels_height + options.axis.tickSize + self.title.h
+        )
+        self.x_label.x = (
+            options.padding.left + y_axis_label_width + y_axis_tick_labels_width + options.axis.tickSize
+        )
+        self.x_label.y = height - (options.padding.bottom + x_axis_label_height)
+        self.x_label.w = width - (
+            options.padding.left + options.padding.right + options.axis.tickSize + y_axis_label_width + y_axis_tick_labels_width
+        )
         self.x_label.h = x_axis_label_height
 
         self.y_tick_labels.x = self.y_label.x + self.y_label.w
@@ -757,10 +752,10 @@ class Layout(object):
 
         max_width = max_height = 0.0
         if not axis.hide:
-            extents = [cx.text_extents(safe_unicode(
-                        tick[1], options.encoding,
-                        ))[2:4] # get width and height as a tuple
-                       for tick in ticks]
+            extents = [
+                cx.text_extents(safe_unicode(tick[1], options.encoding))[2:4]  # get width and height as a tuple
+                for tick in ticks
+            ]
             if extents:
                 widths, heights = zip(*extents)
                 max_width, max_height = max(widths), max(heights)
@@ -771,7 +766,7 @@ class Layout(object):
                     max_width, max_height = (
                         max_width * cos + max_height * sin,
                         max_width * sin + max_height * cos,
-                        )
+                    )
         cx.restore()
         return max_width, max_height
 
@@ -874,7 +869,7 @@ DEFAULT_OPTIONS = Option(
         args=Option(
             initialColor=DEFAULT_COLOR,
             colors=None,
-            ),
+        ),
     ),
     title=None,
     titleColor='#000000',

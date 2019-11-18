@@ -1,4 +1,4 @@
-# Copyright(c) 2007-2010 by Roberto Garcia Carvajal <roberpot@gmail.com>
+# Copyright(c) 2007-2019 by Roberto Garcia Carvajal <roberpot@gmail.com>
 #
 # This file is part of PyCha.
 #
@@ -38,18 +38,18 @@ class RingChart(Chart):
 
     def _updateChart(self):
         """Evaluates measures for pie charts"""
-        self.rings = [i
-                      for i in set(
-                      [data[0]
-                        for dataset in self.datasets
-                        for data in dataset[1]])]
+        self.rings = [
+            i
+            for i in set([data[0] for dataset in self.datasets for data in dataset[1]])
+        ]
 
         self.nrings = len(self.rings)
 
         self.dataset_names = [i for i in
                               set([data[0] for data in self.datasets])]
-        self.dataset_order = {val: i
-            for i, val in enumerate(self.dataset_names)}
+        self.dataset_order = {
+            val: i for i, val in enumerate(self.dataset_names)
+        }
 
         slices = {i: list() for i in self.rings}
 
@@ -74,8 +74,8 @@ class RingChart(Chart):
                     angle += fraction
                     fraction = slice['value'] / s[i]
                     self.slices[i].append(
-                        Slice(slice['name'], fraction, i, slice['value'],
-                        angle))
+                        Slice(slice['name'], fraction, i, slice['value'], angle)
+                    )
 
     def _updateTicks(self):
         """Evaluates pie ticks"""
@@ -84,7 +84,7 @@ class RingChart(Chart):
         if self.options.axis.x.ticks:
             ticks = [tick['v'] for tick in self.options.axis.x.ticks]
             if frozenset(lookups) != frozenset(ticks):
-                #TODO: Is there better option than ValueError?
+                # TODO: Is there better option than ValueError?
                 raise ValueError(u"Incompatible ticks")
             for tick in self.options.axis.x.ticks:
                 if not isinstance(tick, Option):
@@ -248,7 +248,7 @@ class RingLayout(Layout):
         self._areas = (
             (self.title, (1, 126 / 255.0, 0)),  # orange
             (self.chart, (75 / 255.0, 75 / 255.0, 1.0)),  # blue
-            )
+        )
 
         self._lines = []
 
@@ -265,8 +265,9 @@ class RingLayout(Layout):
         self.chart.x = self.title.x
         self.chart.y = self.title.y + self.title.h
         self.chart.w = self.title.w
-        self.chart.h = height - self.title.h - (options.padding.top
-                                                + options.padding.bottom)
+        self.chart.h = height - self.title.h - (
+            options.padding.top + options.padding.bottom
+        )
 
         self.radius = min(self.chart.w / 2.0, self.chart.h / 2.0)
 
