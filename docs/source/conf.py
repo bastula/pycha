@@ -48,7 +48,7 @@ copyright = u'2007-2019, Lorenzo Gil Sánchez'
 # built documents.
 #
 # The short X.Y version.
-version = '0.8.1'
+version = '0.8.2.dev'
 # The full version, including alpha/beta/rc tags.
 release = version
 
