@@ -1,9 +1,15 @@
 Changes
 =======
 
-0.7.1dev (unreleased)
+0.8.1 (2019-11-17)
 ---------------------
-- ...
+- Forgot to update Changelog for 0.8.0
+
+0.8.0 (2019-11-17)
+---------------------
+- Add support for Python 3 by encukou
+- Add support for Tox, Pyflakes, Coverage and Buildbucket pipelines
+- Remove support for Buildout
 
 0.7.0 (2012-04-07)
 ------------------
